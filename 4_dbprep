@@ -1,0 +1,74 @@
+#!/bin/bash
+
+
+
+if [ $# -lt 8 ]; then
+  echo "Usage: $0  -d dbhost -s scmhost -u dbuser -p dbpass"
+  exit 1
+fi
+
+while getopts ":d:s:u:p:" opt; do
+      case $opt in
+	      d)
+	          DBHOST=$OPTARG
+		          ;;
+	      s)
+	          SCMHOST=$OPTARG
+		          ;;
+	      u)
+	          DBUSER=$OPTARG
+		          ;;
+	      d)
+	          DBPASS=$OPTARG
+		          ;;
+	      \?)
+	            echo "Invalid option: -$OPTARG" >&2
+		          exit 1
+			        ;;
+	      :)
+	            echo "Option -$OPTARG requires an argument." >&2
+		          exit 1
+			        ;;
+	    esac
+      done
+
+pssh --inline-stdout  -t 0 -h  hostlist.txt -l ec2-user -x '-tt' -X '-oStrictHostKeyChecking=no'  'sudo   yum -y install mysql-connector-java'
+
+#mysql -h $DBHOST -u $DBUSER -p $DBPASS -e 'grant all on `%`.* to 'temp'@'%' identified by 'temp' with grant option;'
+# mysql -h $DBHOST -u $DBUSER  --password=${DBPASS}  -e "GRANT ALL PRIVILEGES ON `%`.* TO scm@'%' IDENTIFIED BY 'scm' WITH GRANT OPTION;"
+
+create database amon DEFAULT CHARACTER SET utf8; 
+grant all on amon.* TO 'amon'@'%' IDENTIFIED BY 'password'; 
+
+create database smon DEFAULT CHARACTER SET utf8; 
+grant all on smon.* TO 'smon'@'%' IDENTIFIED BY 'password'; 
+
+create database rman DEFAULT CHARACTER SET utf8;
+grant all on rman.* TO 'rman'@'%' IDENTIFIED BY 'password';
+
+create database hmon DEFAULT CHARACTER SET utf8;
+grant all on hmon.* TO 'hmon'@'%' IDENTIFIED BY 'password';
+
+create database hive DEFAULT CHARACTER SET utf8;
+grant all on hive.* TO 'hive'@'%' IDENTIFIED BY 'password';
+
+create database nav DEFAULT CHARACTER SET utf8;
+grant all on nav.* TO 'nav'@'%' IDENTIFIED BY 'password';
+
+echo "if you can't seem to find the jdbc jar, then it could be that cloudera manager server is not installed yet"
+# #mysql> 
+#
+# # the doc didn't work on RDS. I had to use:
+#
+# GRANT ALL PRIVILEGES ON `%`.* TO temp@'%' IDENTIFIED BY 'temp' WITH GRANT OPTION;
+#
+# #this is a workaround if using rds as the store
+# GRANT ALL PRIVILEGES ON `%`.* TO scm@'%' IDENTIFIED BY 'scm' WITH GRANT OPTION;
+#
+# #  On the Cloudera Manager Server host (myhost2), run the script:
+#
+ /usr/share/cmf/schema/scm_prepare_database.sh mysql -h $DBHOST -u temp -ptemp --scm-host $SCMHOST  scm scm scm
+#
+# mysql> drop user 'temp'@'%';
+#
+# mv /etc/cloudera-scm-server/db.mgmt.properties /tmp/

@@ -1,0 +1,47 @@
+#!/bin/bash
+
+DOIMPALA="0"
+HUEHOST="NONE"
+
+while getopts ":ih:" opt; do
+    case $opt in
+	h)
+	    HUEHOST=$OPTARG
+	    ;;
+	i)
+	    DOIMPALA="1"
+	    ;;
+	\?)
+	    echo "Invalid option: -$OPTARG" >&2
+	    exit 1
+	    ;;
+	:)
+	    echo "Option -$OPTARG requires an argument." >&2
+	    exit 1
+	    ;;
+    esac
+done
+
+pssh --inline-stdout  -t 0 -h  hostlist.txt -l ec2-user -x '-tt' -X '-oStrictHostKeyChecking=no'  'wget http://archive.cloudera.com/cdh4/redhat/6/x86_64/cdh/cloudera-cdh4.repo'
+pssh --inline-stdout  -t 0 -h  hostlist.txt -l ec2-user -x '-tt' -X '-oStrictHostKeyChecking=no'  'sudo bash -c "mv cloudera-cdh4.repo /etc/yum.repos.d/"'
+
+pssh --timeout=0 --inline-stdout  -h  hostlist.txt -l ec2-user -x '-tt' -X '-oStrictHostKeyChecking=no'  "sudo yum -y install bigtop-utils bigtop-jsvc bigtop-tomcat hadoop hadoop-hdfs hadoop-httpfs hadoop-mapreduce hadoop-yarn hadoop-client hadoop-0.20-mapreduce hue-plugins hbase hive oozie oozie-client pig zookeeper"
+
+#To install the hue-common package and all Hue applications on the Hue machine, install the hue meta-package:
+if [ "$HUEHOST" -ne "NONE" ]; then
+    ssh $HUEHOST sudo yum install hue
+fi
+
+if [ "$DOIMPALA" -eq "1" ]; then
+    pssh --inline-stdout  -h  hostlist.txt -l ec2-user -x '-tt' -X '-oStrictHostKeyChecking=no'  "sudo yum -y install impala impala-shell"
+fi
+
+pssh --inline-stdout  -h  hostlist.txt -l ec2-user -x '-tt' -X '-oStrictHostKeyChecking=no'  " sudo /sbin/chkconfig hue off"
+pssh --inline-stdout  -h  hostlist.txt -l ec2-user -x '-tt' -X '-oStrictHostKeyChecking=no'  " sudo /sbin/chkconfig oozie off"
+pssh --inline-stdout  -h  hostlist.txt -l ec2-user -x '-tt' -X '-oStrictHostKeyChecking=no'  " sudo /sbin/chkconfig hadoop-httpfs off"
+
+# To install the Cloudera Manager Agent and Services on a RHEL system if you're transferring RPMs manually:
+# sudo yum --nogpgcheck localinstall cloudera-manager-agent-package.*.x86_64.rpm cloudera-manager-daemons
+pssh --timeout=0 --inline-stdout  -h  hostlist.txt -l ec2-user -x '-tt' -X '-oStrictHostKeyChecking=no'  "  sudo yum install cloudera-manager-agent cloudera-manager-daemons"
+
+

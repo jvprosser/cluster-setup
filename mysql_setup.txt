@@ -1,0 +1,26 @@
+
+
+grant all on scm.* TO 'nav'@'%' IDENTIFIED BY 'password';
+
+create database amon DEFAULT CHARACTER SET utf8; 
+grant all on amon.* TO 'amon'@'%' IDENTIFIED BY 'password'; 
+
+create database smon DEFAULT CHARACTER SET utf8; 
+grant all on smon.* TO 'smon'@'%' IDENTIFIED BY 'password'; 
+
+create database rman DEFAULT CHARACTER SET utf8;
+grant all on rman.* TO 'rman'@'%' IDENTIFIED BY 'password';
+
+create database hmon DEFAULT CHARACTER SET utf8;
+grant all on hmon.* TO 'hmon'@'%' IDENTIFIED BY 'password';
+
+create database hive DEFAULT CHARACTER SET utf8;
+grant all on hive.* TO 'hive'@'%' IDENTIFIED BY 'password';
+
+create database nav DEFAULT CHARACTER SET utf8;
+grant all on nav.* TO 'nav'@'%' IDENTIFIED BY 'password';
+
+
+#backing up DB
+#  mysqldump -h<hostname> -u<username> -p<password> <database> > /tmp/<database-backup>.sql
+
