@@ -1,11 +1,5 @@
 #!/bin/bash                                                                                                                                                                         
-HOSTFILE=/tmp/etc.hosts
 
-cat /tmp/etc.hosts >> /etc/hosts
-
-
-sudo rpm -U /tmp/jdk-7u51-linux-x64.rpm
-sudo yum -y install mysql-connector-java
 
 yum -y install telnet wireshark tcpdump screen lynx links lsof mysql
 
@@ -19,7 +13,6 @@ UTC=True
 EOF
 
 ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
-
 
 ntpdate 0.rhel.pool.ntp.org
 
@@ -39,16 +32,13 @@ sed -i -e s/SELINUX=permissive/SELINUX=disabled/ /etc/selinux/config
 
 cp /etc/rc.local /etc/sysconfig/_rc.local.orig.`date +%d%m%y%H%M%S`
 
-# address the bug in some ec2 instances where they leave out the trailing EOL
-EC2BUG=`grep -c EOL /etc/rc.local`
+
 
 # Set swappiness to minimum
-echo "vm.swappiness = 0 >> /etc/sysctl.conf"
+echo "vm.swappiness = 1 >> /etc/sysctl.conf"
 
 
-if [ $EC2BUG -eq 1 ]; then
-    echo -e "\n\nEOL" >> /etc/rc.local
-fi
+
 cat <<EOF >> /etc/rc.local
 
 ##### CDH Settings ########################################
