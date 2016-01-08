@@ -1,28 +1,15 @@
 #!/bin/bash
 
-cp ec2-user.pem ~/.ssh/identity
+alias jpssh="~/pssh-2.3.1/bin/pssh --timeout=0 --inline-stdout -h ~/hostlist.txt -x '-tt' -X '-oStrictHostKeyChecking=no'" 
+alias jpscp="~/pssh-2.3.1/bin/pscp -h ~/hostlist.txt -X '-oStrictHostKeyChecking=no'"
 
-sudo yum -y install emacs mysql telnet wireshark tcpdump screen lynx links lsof
+sudo yum -y install git emacs mysql telnet wireshark tcpdump screen lynx links lsof
 
-echo "installing pssh"
-cd dev/pssh-2.3.1
-sudo python ez_setup.py
-sudo python setup.py install
 
-echo "installing s3cmd"
-wget 'http://sourceforge.net/projects/s3tools/files/latest/download?source=files'
-tar xvfz s3cmd-1.5.0-beta1.tar.gz 
-cd s3cmd-1.5.0-beta1
-sudo python setup.py install
-
-echo "don't forget to run s3cmd --configure !!!"
 
 echo "Setting up cloudera repos"
-wget http://archive.cloudera.com/cdh4/redhat/6/x86_64/cdh/cloudera-cdh4.repo  
-sudo mv cloudera-cdh4.repo /etc/yum.repos.d/
-
-wget http://archive.cloudera.com/cm4/redhat/5/x86_64/cm/cloudera-manager.repo
-sudo mv cloudera-manager.repo /etc/yum.repos.d/
+wget https://archive.cloudera.com/cm5/redhat/7/x86_64/cm/cloudera-manager.repo
+mv cloudera-manager.repo /etc/yum.repos.d/
 
 ls /etc/yum.repos.d/
 
@@ -32,24 +19,29 @@ sudo yum -y install cloudera-manager-server
 
 
 echo "install JDK"
-chmod 755  ./jdk-6u45-linux-x64-rpm.bin 
-sudo ./jdk-6u45-linux-x64-rpm.bin 
+yum -y install oracle-j2sdk1.7
+ln -s /usr/java/jdk1.7.0_67-cloudera/ /usr/java/latest
+
+echo "get maven"
+wget http://mirrors.sonic.net/apache/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
+tar xvf apache-maven-3.3.9-bin.tar.gz
+mv apache-maven-3.3.9 /usr/local/bin
 
 echo "set up JAVA ENVS"
 export JAVA_HOME=/usr/java/latest
-export PATH=$JAVA_HOME/bin:$PATH
+export PATH=$JAVA_HOME/bin:$PATH:/usr/local/bin/apache-maven-3.3.9/bin
 
 echo "export JAVA_HOME=/usr/java/latest" >> ~/.bashrc   
-echo "export PATH=$JAVA_HOME/bin:$PATH" >> ~/.bashrc
+echo "export PATH=$JAVA_HOME/bin:$PATH:/usr/local/bin/apache-maven-3.3.9/bin" >> ~/.bashrc
 
 echo "get sql connector"
-wget "http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.29.tar.gz"
-gunzip  ./mysql-connector-java-5.1.29.tar.gz 
-tar xvf  ./mysql-connector-java-5.1.29.tar  mysql-connector-java-5.1.29/mysql-connector-java-5.1.29-bin.jar
+wget "http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.38.tar.gz"
+gunzip  ./mysql-connector-java-5.1.38.tar.gz 
+tar xvf  ./mysql-connector-java-5.1.38.tar  mysql-connector-java-5.1.38/mysql-connector-java-5.1.38-bin.jar
 
 # is this path created as a logical link using alternatives?
-#mkdir -p /usr/share/java/
-sudo bash -c "cp /home/ec2-user/mysql-connector-java-5.1.29/mysql-connector-java-5.1.29-bin.jar /usr/share/java/mysql-connector-java.jar"
+mkdir -p /usr/share/java/
+sudo bash -c "cp /home/ec2-user/mysql-connector-java-5.1.38/mysql-connector-java-5.1.38-bin.jar /usr/share/java/mysql-connector-java.jar"
 
 # 
 # #mysql> grant all on *.* to 'temp'@'%' identified by 'temp' with grant option;
