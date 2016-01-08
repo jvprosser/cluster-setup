@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-pscp --timeout=0 -h  hostlist.txt -l ec2-user  -X '-oStrictHostKeyChecking=no'  2_target_setup.sh /tmp/2_target_setup.sh
+jpscp 2_target_setup.sh /tmp/2_target_setup.sh
 
 jpssh 'wget https://archive.cloudera.com/cm5/redhat/7/x86_64/cm/cloudera-manager.repo;mv cloudera-manager.repo /etc/yum.repos.d/'
 jpssh yum -y install oracle-j2sdk1.7
