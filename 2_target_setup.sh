@@ -1,43 +1,82 @@
 #!/bin/bash                                                                                                                                                                         
 
+REBOOT=$1
+REDHAT_MAJOR_VERSION=`cat /etc/redhat-release | cut -d" " -f 4 | cut -d. -f 1`
 
 yum -y install telnet wireshark tcpdump screen lynx links lsof mysql
 
 service ntpdate stop
 service ntpd stop
 
-cp /etc/sysconfig/clock /etc/sysconfig/_clock.orig.`date +%d%m%y`
-cat > /etc/sysconfig/clock <<EOF
-ZONE="America/New_York"
-UTC=True
-EOF
 
-ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
+if [ $REDHAT_MAJOR_VERSION -eq 6 ]; then
+
+  cp /etc/sysconfig/clock /etc/sysconfig/_clock.orig.`date +%d%m%y`
+  cat > /etc/sysconfig/clock <<EOF
+EOF
+  ZONE="America/New_York"
+  UTC=True
+  EOF
+  
+  ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
+  
+ chkconfig postfix off
+ service postfix stop
+ chkconfig cups off
+ service cups stop
+ service iptables stop
+ service ip6tables stop
+ chkconfig iptables off
+ chkconfig ip6tables off
+fi
+
+if [ $REDHAT_MAJOR_VERSION -eq 7 ]; then
+
+ timedatectl set-timezone UTC
+ systemctl stop firewalld
+ systemctl disable firewalld
+ 
+ systemctl disable cups
+ systemctl disable dhcpd
+ systemctl disable avahi-daemon
+ # not using nfs
+ systemctl disable rpcidmapd
+ systemctl disable netfs
+fi
 
 ntpdate 0.rhel.pool.ntp.org
 
 service ntpdate start
 service ntpd start
-chkconfig postfix off
-service postfix stop
-chkconfig cups off
-service cups stop
-service iptables stop
-service ip6tables stop
-chkconfig iptables off
-chkconfig ip6tables off
 
-sed -i -e s/SELINUX=enforcing/SELINUX=disabled/ /etc/selinux/config 
-sed -i -e s/SELINUX=permissive/SELINUX=disabled/ /etc/selinux/config
+
+
+echo "options ipv6 disable=1" >> /etc/modprobe.d/disabled.conf
+echo "NETWORKING_IPV6=no" >> /etc/sysconfig/network
+echo "IPV6INIT=no" >> /etc/sysconfig/network
+
+echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6
+echo 1 > /proc/sys/net/ipv6/conf/default/disable_ipv6
+
+echo -e 'Host *\nUseRoaming no' >> /etc/ssh/ssh_config
+
+sed -i -e 's/#AddressFamily any/AddressFamily inet/'  /etc/ssh/sshd_config
+
+sed -i -e 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config 
+sed -i -e 's/SELINUX=permissive/SELINUX=disabled/' /etc/selinux/config
+
+
 
 cp /etc/rc.local /etc/sysconfig/_rc.local.orig.`date +%d%m%y%H%M%S`
 
 
 
 # Set swappiness to minimum
-echo "vm.swappiness = 1 >> /etc/sysctl.conf"
+echo "vm.swappiness = 1" >> /etc/sysctl.conf
 
+RCLOCALDONE=`grep -c THP /etc/rc.local`
 
+if [ $RCLOCALDONE -ne 1 ]; then
 
 cat <<EOF >> /etc/rc.local
 
@@ -53,11 +92,22 @@ echo "7f" > /sys/devices/vif-0/net/eth0/queues/rx-0/rps_cpus
 echo "1" > /proc/sys/net/ipv4/tcp_low_latency
 
 #############################################
+
  
 EOF
 
+fi
 
+EXITZERO=`grep -c 'exit 0' /etc/rc.local`
+if [ $EXITZERO -eq 1 ]; then
+  sed -i -e 's/exit 0/#exit 0/' /etc/rc.local
+  echo "exit 0" >> /etc/rc.local
+fi
+
+chmod +x /etc/rc.d/rc.local
+
+if [ "$REBOOT" == "reboot" ]; then
 reboot
-
+fi
 
 
