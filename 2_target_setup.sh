@@ -86,9 +86,14 @@ echo never > /sys/kernel/mm/redhat_transparent_hugepage/defrag
 echo never > /sys/kernel/mm/redhat_transparent_hugepage/enabled
 
 # set RPS settings
+# needs advanced network services. run this command to test and look for ixgbevf 
+# see http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/enhanced-networking.html#enhanced-networking-linux for ec2
+# ethtool -i eth0
+# driver: ixgbevf
 echo "7f" > /sys/devices/vif-0/net/eth0/queues/rx-0/rps_cpus
 
-# Enable TCP no delay:
+# Enable TCP no delay: 
+# the TCP stack makes decisions that prefer lower latency as opposed to higher throughput.
 echo "1" > /proc/sys/net/ipv4/tcp_low_latency
 
 #############################################
