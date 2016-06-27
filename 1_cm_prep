@@ -12,7 +12,8 @@ scp -r .ssh/  Nodes[1-N].vpc.jpmorgan.com:
 alias jpssh="~/pssh-2.3.1/bin/pssh --timeout=0 --inline-stdout -h ~/hostlist.txt -x '-tt' -X '-oStrictHostKeyChecking=no'" 
 alias jpscp="~/pssh-2.3.1/bin/pscp -h ~/hostlist.txt -X '-oStrictHostKeyChecking=no'"
 
-sudo yum -y install git emacs mysql telnet wireshark tcpdump screen lynx links lsof
+sudo yum -y install git emacs mysql telnet wireshark tcpdump screen lynx links lsof 
+sudo yum -y install krb5-workstation krb5-libs openldap-clients
 
 
 
