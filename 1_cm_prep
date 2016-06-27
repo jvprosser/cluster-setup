@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#install pssh-2.3.1 - git clone http://code.google.com/p/parallel-ssh/
+# or https://pypi.python.org/pypi/pssh/2.3.1
 alias jpssh="~/pssh-2.3.1/bin/pssh --timeout=0 --inline-stdout -h ~/hostlist.txt -x '-tt' -X '-oStrictHostKeyChecking=no'" 
 alias jpscp="~/pssh-2.3.1/bin/pscp -h ~/hostlist.txt -X '-oStrictHostKeyChecking=no'"
 
@@ -17,6 +19,7 @@ echo "Installing cloudera manager stuff"
 sudo yum -y install cloudera-manager-daemons 
 sudo yum -y install cloudera-manager-server
 
+# do a yum -list | grep -i cloudera to get a list of java packages that come with the CLoudera disto.
 
 echo "install JDK"
 yum -y install oracle-j2sdk1.7
