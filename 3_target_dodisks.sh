@@ -62,4 +62,11 @@ for i in `ls /dev/xvd[b-z] | cut -d"/" -f3`; do
 done
 mount -a
 #############################################
-
+# Generate a list of dfs data disks. grepping for hadoop may not be appropriate.
+df –h  | grep hadoop | awk '{print $1}'  >resize.txt   
+for i in `cat resize.txt`;do 
+# -m reserved-blocks-percentage - recovers %5 disk
+tune2fs -m 0 $i
+# -c max-mount-counts disable auto filesystem check - so fsck will never get run automatically after N mounts/reboots.
+tune2fs -c 0 $i
+done
