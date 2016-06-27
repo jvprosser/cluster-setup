@@ -28,6 +28,9 @@ EOF
  service ip6tables stop
  chkconfig iptables off
  chkconfig ip6tables off
+ chkconfig nscd start
+ chkconfig ncsd on
+ 
 fi
 
 if [ $REDHAT_MAJOR_VERSION -eq 7 ]; then
@@ -48,6 +51,9 @@ if [ $REDHAT_MAJOR_VERSION -eq 7 ]; then
  systemctl disable rpcidmapd
  systemctl stop netfs
  systemctl disable netfs
+ systemctl start nscd
+ systemctl enable nscd
+ systemctl status nscd
 fi
 
 ntpdate 0.rhel.pool.ntp.org
