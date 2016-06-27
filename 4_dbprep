@@ -1,41 +1,78 @@
 #!/bin/bash
 
+echo Install mysql server
+
+edit my.cnf to look like this:
+##########
+vi /etc/my.cnf
+
+[mysqld]
+datadir=/var/lib/mysql
+socket=/var/lib/mysql/mysql.sock
+# Disabling symbolic-links is recommended to prevent assorted security risks
+symbolic-links=0
+# Settings user and group are ignored when systemd is used.
+# If you need to run mysqld under a different user or group,
+# customize your systemd unit file for mysql according to the
+# instructions in http://fedoraproject.org/wiki/Systemd
+
+[mysqld_safe]
+log-error=/var/log/mysql/mysql.log
+pid-file=/var/run/mysql/mysql.pid
+
+#
+# include all files from the config directory
+#
+[mysqld]
+transaction-isolation = READ-COMMITTED
+# Disabling symbolic-links is recommended to prevent assorted security risks;
+# to do so, uncomment this line:
+# symbolic-links = 0
+
+key_buffer = 16M
+key_buffer_size = 32M
+max_allowed_packet = 32M
+thread_stack = 256K
+thread_cache_size = 64
+query_cache_limit = 8M
+query_cache_size = 64M
+query_cache_type = 1
+
+max_connections = 1025
+#expire_logs_days = 10
+#max_binlog_size = 100M
+
+#log_bin should be on a disk with enough free space. Replace '/var/lib/mysql/mysql_binary_log' with an appropriate path for your system
+#and chown the specified folder to the mysql user.
+log_bin=/var/lib/mysql/mysql_binary_log
+
+binlog_format = mixed
+
+read_buffer_size = 2M
+read_rnd_buffer_size = 16M
+sort_buffer_size = 8M
+join_buffer_size = 8M
+
+# InnoDB settings
+innodb_file_per_table = 1
+innodb_flush_log_at_trx_commit  = 2
+innodb_log_buffer_size = 64M
+innodb_buffer_pool_size = 4G
+innodb_thread_concurrency = 24
+innodb_flush_method = O_DIRECT
+innodb_log_file_size = 512M
 
 
-if [ $# -lt 8 ]; then
-  echo "Usage: $0  -d dbhost -s scmhost -u dbuser -p dbpass"
-  exit 1
-fi
+_______________________________________________________________
 
-while getopts ":d:s:u:p:" opt; do
-      case $opt in
-	      d)
-	          DBHOST=$OPTARG
-		          ;;
-	      s)
-	          SCMHOST=$OPTARG
-		          ;;
-	      u)
-	          DBUSER=$OPTARG
-		          ;;
-	      d)
-	          DBPASS=$OPTARG
-		          ;;
-	      \?)
-	            echo "Invalid option: -$OPTARG" >&2
-		          exit 1
-			        ;;
-	      :)
-	            echo "Option -$OPTARG requires an argument." >&2
-		          exit 1
-			        ;;
-	    esac
-      done
+systemctl status mysql
+systemctl start mysql
 
-pssh --inline-stdout  -t 0 -h  hostlist.txt -l ec2-user -x '-tt' -X '-oStrictHostKeyChecking=no'  'sudo   yum -y install mysql-connector-java'
+/usr/bin/mysql_secure_installation
 
-#mysql -h $DBHOST -u $DBUSER -p $DBPASS -e 'grant all on `%`.* to 'temp'@'%' identified by 'temp' with grant option;'
-# mysql -h $DBHOST -u $DBUSER  --password=${DBPASS}  -e "GRANT ALL PRIVILEGES ON `%`.* TO scm@'%' IDENTIFIED BY 'scm' WITH GRANT OPTION;"
+/usr/share/cmf/schema/scm_prepare_database.sh mysql scm -u root -p <PASSWORD>
+
+mysql -u root -p <PASSWORD>
 
 create database cmf DEFAULT CHARACTER SET utf8; 
 grant all on cmf.* TO 'cmf'@'%' IDENTIFIED BY 'password'; 
@@ -69,20 +106,4 @@ grant all on sentry.* TO 'sentry'@'%' IDENTIFIED BY 'password';
 flush privileges;
 
 
-echo "if you can't seem to find the jdbc jar, then it could be that cloudera manager server is not installed yet"
-# #mysql> 
-#
-# # the doc didn't work on RDS. I had to use:
-#
-# GRANT ALL PRIVILEGES ON `%`.* TO temp@'%' IDENTIFIED BY 'temp' WITH GRANT OPTION;
-#
-# #this is a workaround if using rds as the store
-# GRANT ALL PRIVILEGES ON `%`.* TO scm@'%' IDENTIFIED BY 'scm' WITH GRANT OPTION;
-#
-# #  On the Cloudera Manager Server host (myhost2), run the script:
-#
- /usr/share/cmf/schema/scm_prepare_database.sh mysql -h $DBHOST -u temp -ptemp --scm-host $SCMHOST  scm scm scm
-#
-# mysql> drop user 'temp'@'%';
-#
-# mv /etc/cloudera-scm-server/db.mgmt.properties /tmp/
+
