@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# retrieve JCEUnlimitedEncryption.zip from
+# http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html
+# upload it to your launch node and unzip it.
+
 #install pssh-2.3.1 - git clone http://code.google.com/p/parallel-ssh/
 # or https://pypi.python.org/pypi/pssh/2.3.1
 alias jpssh="~/pssh-2.3.1/bin/pssh --timeout=0 --inline-stdout -h ~/hostlist.txt -x '-tt' -X '-oStrictHostKeyChecking=no'" 
