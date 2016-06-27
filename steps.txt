@@ -22,9 +22,9 @@
   # upload the JCE zip file and unzip it
   jpssh mv /usr/java/jdk1.7.0_67-cloudera/jre/lib/security/US_export_policy.jar /usr/java/jdk1.7.0_67-cloudera/jre/lib/security/ORIG_US_export_policy.jar
 
-jpssh mv /usr/java/jdk1.7.0_67-cloudera/jre/lib/security/local_policy.jar /usr/java/jdk1.7.0_67-cloudera/jre/lib/security/ORIG_local_policy.jar
+jpssh mv /usr/java/latest/jre/lib/security/local_policy.jar /usr/java/latest/jre/lib/security/ORIG_local_policy.jar
 
-jpscp  UnlimitedJCEPolicy/*  /usr/java/jdk1.7.0_67-cloudera/jre/lib/security/
+jpscp  UnlimitedJCEPolicy/*  /usr/java/latest/jre/lib/security/
   
   wget http://mirrors.sonic.net/apache/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
   tar xvf apache-maven-3.3.9-bin.tar.gz
@@ -35,7 +35,7 @@ jpscp  UnlimitedJCEPolicy/*  /usr/java/jdk1.7.0_67-cloudera/jre/lib/security/
 
   echo "go set up mariadb"
 ssh to db server
-yum -y install mariadb-server
+ yum -y install mariadb-server
  vi /etc/my.cnf
 ########### add this
 [mysqld]
