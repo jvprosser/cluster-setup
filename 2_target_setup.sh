@@ -4,6 +4,7 @@ REBOOT=$1
 REDHAT_MAJOR_VERSION=`cat /etc/redhat-release | cut -d" " -f 4 | cut -d. -f 1`
 
 yum -y install telnet wireshark tcpdump screen lynx links lsof mysql
+yum -y install install cloudera-manager-agent
 
 service ntpdate stop
 service ntpd stop
