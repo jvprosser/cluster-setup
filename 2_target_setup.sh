@@ -36,11 +36,17 @@ if [ $REDHAT_MAJOR_VERSION -eq 7 ]; then
  systemctl stop firewalld
  systemctl disable firewalld
  
+ systemctl stop cups
  systemctl disable cups
+
+ systemctl stop dhcpd
  systemctl disable dhcpd
+  systemctl stop avahi-daemon
  systemctl disable avahi-daemon
  # not using nfs
+ systemctl stop rpcidmapd
  systemctl disable rpcidmapd
+ systemctl stop netfs
  systemctl disable netfs
 fi
 
