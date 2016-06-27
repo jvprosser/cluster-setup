@@ -5,6 +5,9 @@
 # upload it to your launch node and unzip it.
 
 #install pssh-2.3.1 - git clone http://code.google.com/p/parallel-ssh/
+# enable password less login on all nodes e.g. 
+scp -r .ssh/  Nodes[1-N].vpc.jpmorgan.com:
+  
 # or https://pypi.python.org/pypi/pssh/2.3.1
 alias jpssh="~/pssh-2.3.1/bin/pssh --timeout=0 --inline-stdout -h ~/hostlist.txt -x '-tt' -X '-oStrictHostKeyChecking=no'" 
 alias jpscp="~/pssh-2.3.1/bin/pscp -h ~/hostlist.txt -X '-oStrictHostKeyChecking=no'"
