@@ -17,7 +17,10 @@ yum remove openjdk
 sudo yum -y install git emacs mysql telnet wireshark tcpdump screen lynx links lsof 
 sudo yum -y install krb5-workstation krb5-libs openldap-clients
 
-
+# certtoolkit
+yum -y install python-pip 
+pip install beautifulsoup4 cm_api paramiko pyyaml requests_ntlm
+wget http://github.mtv.cloudera.com/CertTeam/CertToolkit/archive/master.zip
 
 echo "Setting up cloudera repos"
 wget https://archive.cloudera.com/cm5/redhat/7/x86_64/cm/cloudera-manager.repo
