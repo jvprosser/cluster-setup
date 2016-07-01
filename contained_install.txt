@@ -53,14 +53,11 @@
 
             - #mgmt_home=/usr/share/cmf
             - #cloudera_mysql_connector_jar=/usr/share/java/mysql-connector-java.jar
-
     - Per-cluster
-
         - cm-agent ( etc/cloudera-scm-agent/config.ini )
-
-            - server_host=localhost
-
-
+        - server_host=localhost
+-------------
+# prep
 
   scp -i jp.pem ec2-user@172.31.14.178:centrify-suite-2016.1-rhel4thru7-x86_64.tgz  .
   ssh -i jp.pem ec2-user@172.31.14.178
@@ -83,13 +80,34 @@ add alias commands
   jpssh ls /usr/java
   jpssh ls /usr/java/jdk1.7.0_67-cloudera
 
-do this on db server
+
+# create temporary host file entries for now...
+cat <<EOF1 >> ./hosts.txt
+172.31.11.34    cm.jprosser.com   cm
+172.31.11.35    dn1.jprosser.com  dn1
+172.31.11.36    dn2.jprosser.com  dn2
+172.31.11.37    dn3.jprosser.com  dn3
+172.31.25.97    db.jprosser.com  db
+EOF1
+
+# append to /etc/hosts
+jpscp ./hosts.txt /tmp/
+jpssh 'cat /tmp/hosts.txt >> /etc/hosts'
+
+# packages
+# needed for cloudera-scm-server init script
+jpssh yum -y install psmisc 
+
+
+#do this on db server
+# SCM requires InnoDb MySQL db engine
+
   sudo yum install mysql-server
   ls /etc/init.d
 
   mv /etc/my.cnf /etc/my.cnf_orig
 
-paste contents from git
+#paste my.cnf contents from git or cloudera docs
   vi /etc/my.cnf
   chkconfig mysqld on
   chkconfig --list | grep my
@@ -100,28 +118,17 @@ paste contents from git
   tar xvfz mysql-connector-java-5.1.39.tar.gz
   cd mysql-connector-java-5.1.39
 
-create the cdh db grants
+#create the cdh db grants
   mysql -u root -p
 
-  jpssh mkdir -p /cloudera/opt/cloudera /cloudera/etc /cloudera/var
 
-  jpssh mkdir -p /cloudera/opt/cloudera-manager
 
-This needs to be here for  share/cmf/schema/scm_prepare_database.sh
-  jpssh mkdir -p /usr/share/java/
-  cd mysql-connector-java-5.1.39
-  jpscp mysql-connector-java-5.1.39-bin.jar /usr/share/java/mysql-connector-java.jar
+# this may not be needed
+#  links --dump http://archive.cloudera.com/cdh5/cdh/5/ | grep cdh5.7.1 | grep tar.gz | grep http| grep -v src | cut -c 7- > cdh5.7.1-packages.txt
+#  more cdh5.7.1-packages.txt
+#  for f in [`cat cdh5.7.1-packages.txt`] ; do  wget $f;done
 
-  jpssh 'useradd --system --home=/cloudera/opt/cloudera-manager/cm-5.7.1/run/cloudera-scm-server --no-create-home --shell=/bin/false --comment "Cloudera SCM User" cloudera-scm'
-  jpssh mkdir -p  /cloudera/var/lib/cloudera-scm-server
-  jpssh chown -R cloudera-scm:cloudera-scm  /cloudera
-  jpssh mkdir -p  /tvlogs/cloudera-scm-server
-  jpssh chown  cloudera-scm:cloudera-scm  /tvlogs/cloudera-scm-server
-
-  links --dump http://archive.cloudera.com/cdh5/cdh/5/ | grep cdh5.7.1 | grep tar.gz | grep http| grep -v src | cut -c 7- > cdh5.7.1-packages.txt
-  more cdh5.7.1-packages.txt
-
-  for f in [`cat cdh5.7.1-packages.txt`] ; do  wget $f;done
+# set up OS on nodes - this will be cooked into AMI.
 
   jpssh "sed -i -e 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config"
   jpssh "sed -i -e 's/SELINUX=permissive/SELINUX=disabled/' /etc/selinux/config"
@@ -137,6 +144,24 @@ This needs to be here for  share/cmf/schema/scm_prepare_database.sh
   jpssh echo "'vm.swappiness = 1' >> /etc/sysctl.conf"
 
 see git repo
+cat <<EOF >> ./rc.local
+##### CDH Settings ########################################
+#disable  THP
+echo never > /sys/kernel/mm/redhat_transparent_hugepage/defrag
+echo never > /sys/kernel/mm/redhat_transparent_hugepage/enabled
+# set RPS settings
+# needs advanced network services. run this command to test and look for ixgbevf 
+# see http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/enhanced-networking.html#enhanced-networking-linux for ec2
+# ethtool -i eth0
+# driver: ixgbevf
+echo "7f" > /sys/devices/vif-0/net/eth0/queues/rx-0/rps_cpus
+# Enable TCP no delay: 
+# the TCP stack makes decisions that prefer lower latency as opposed to higher throughput.
+echo "1" > /proc/sys/net/ipv4/tcp_low_latency
+#############################################
+EOF
+
+
   vi rc.local
   jpscp rc.local /tmp
   jpssh "cat /tmp/rc.local >> /etc/rc.local
@@ -145,9 +170,22 @@ see git repo
   jpssh shutdown -r now
   ping 172.31.11.34
 
+
+
+#### back to cluster deployment
+
+
   wget https://archive.cloudera.com/cm5/cm/5/cloudera-manager-centos7-cm5.7.1_x86_64.tar.gz
 
   jpscp  cloudera-manager-centos7-cm5.7.1_x86_64.tar.gz /tmp
+
+  jpssh mkdir -p /cloudera/opt/cloudera 
+
+# this is where we will extract the CM tarball for installation
+  jpssh mkdir -p /cloudera/opt/cloudera-manager
+# this gives us: etc/  lib/  lib64/  log/  run/  sbin/  share/
+# which we will move to /cloudera/
+
 
   jpssh tar xzf /tmp/cloudera-manager-centos7-cm5.7.1_x86_64.tar.gz -C /cloudera/opt/cloudera-manager/
 
@@ -161,7 +199,16 @@ jpssh "sed -i -e  's/# client_key_file=/# client_key_file=\/cloudera/' /cloudera
 jpssh "sed -i -e 's/# client_cert_file=/# client_cert_file=\/cloudera/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/cloudera-scm-agent/config.ini"
 
 
-export CMHOST=72.31.11.34
+
+jpssh "sed -i -e 's/CMF_VAR=\$CMF_ROOT/CMF_VAR=\$CMF_ROOT\/var/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/default/cloudera-scm-agent"
+jpssh "sed -i -e 's/CMF_VAR=\$CMF_ROOT/CMF_VAR=\$CMF_ROOT\/var/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/default/cloudera-scm-server"
+jpssh "sed -i -e 's/export CMF_SUDO_CMD/#export CMF_SUDO_CMD/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/default/cloudera-scm-server"
+jpssh "sed -i -e 's/export CMF_SUDO_CMD/#export CMF_SUDO_CMD/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/default/cloudera-scm-agent"
+jpssh "sed -i -e 's/#USER/USER/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/default/cloudera-scm-agent"
+
+
+
+export CMHOST=cm.jprosser.com
 ssh ${CMHOST}  mkdir -p /tvlogs/cloudera-scm-headlamp
 ssh ${CMHOST}  mkdir -p /tvlogs/cloudera-scm-firehose
 ssh ${CMHOST}  mkdir -p /tvlogs/cloudera-scm-alertpublisher
@@ -181,14 +228,61 @@ ssh ${CMHOST}  chown cloudera-scm:cloudera-scm  /cloudera/var/lib/cloudera-scm-a
 ssh ${CMHOST}  chown cloudera-scm:cloudera-scm  /cloudera/var/lib/cloudera-scm-eventserver
 ssh ${CMHOST}  chown cloudera-scm:cloudera-scm  /cloudera/var/lib/cloudera-scm-server
 
-# these are referenced. not sure where they are defined though
-export CMF_AGENT_ROOT=/cloudera/usr/lib64/cmf
-export CMF_VAR=/cloudera/var
-export CMF_ETC=/cloudera/etc
 
-jpssh "sed -i -e 's/#USER/USER/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/default/cloudera-scm-agent"
+# for now we cp, so we can redo if needed.  later we'll mv.
+jpssh cp -r /cloudera/opt/cloudera-manager/cm-5.7.1/etc /cloudera/
+jpssh cp -r /cloudera/opt/cloudera-manager/cm-5.7.1/lib /cloudera/
+jpssh cp -r /cloudera/opt/cloudera-manager/cm-5.7.1/lib64 /cloudera/
+jpssh cp -r /cloudera/opt/cloudera-manager/cm-5.7.1/log /cloudera/
+jpssh cp -r /cloudera/opt/cloudera-manager/cm-5.7.1/run /cloudera/
+jpssh cp -r /cloudera/opt/cloudera-manager/cm-5.7.1/sbin /cloudera/
+jpssh cp -r /cloudera/opt/cloudera-manager/cm-5.7.1/share /cloudera/
+
+#This needs to be here for  share/cmf/schema/scm_prepare_database.sh
+  jpssh mkdir -p /usr/share/java/
+  cd mysql-connector-java-5.1.39
+  jpscp mysql-connector-java-5.1.39-bin.jar /usr/share/java/mysql-connector-java.jar
+
+# don't make this homedir it will get moved from the cm tarbal
+  jpssh 'useradd --system --home=/cloudera/run/cloudera-scm-server --no-create-home --shell=/bin/false --comment "Cloudera SCM User" cloudera-scm'
+
+
+  jpssh mkdir -p /cloudera/var
+
+  jpssh mkdir -p  /cloudera/var/lib/cloudera-scm-server
+  jpssh chown -R cloudera-scm:cloudera-scm  /cloudera/var/lib/cloudera-scm-server
+
+  jpssh mkdir -p  /cloudera/var/log
+  jpssh chown -R cloudera-scm:cloudera-scm  /cloudera/var/log
+  jpssh mkdir -p  /tvlogs/cloudera-scm-agent
+  jpssh chown  cloudera-scm:cloudera-scm  /tvlogs/cloudera-scm-agent
+
+  ssh cm.jprosser.com mkdir -p  /tvlogs/cloudera-scm-server
+  ssh cm.jprosser.com chown  cloudera-scm:cloudera-scm  /tvlogs/cloudera-scm-server
+
+  ssh cm.jprosser.com "ln -s /tvlogs/cloudera-scm-server /cloudera/var/log/cloudera-scm-server"
+  jpssh "ln -s /tvlogs/cloudera-scm-agent /cloudera/var/log/cloudera-scm-agent"
+
+
 
 # on db host
 mysql -u root -p
 mysql> grant all on *.* to 'temp'@'%' identified by 'temp' with grant option;
+
+#Run this on cm host
+ssh cm.jprosser.com bash -x /cloudera/share/cmf/schema/scm_prepare_database.sh mysql -h db.jprosser.com   -utemp -ptemp --scm-host cm.jprosser.com scm scm scm
+
+jpssh mkdir  mkdir -p /cloudera/opt/cloudera/parcel-repo
+jpssh chown cloudera-scm:cloudera-scm /cloudera/opt/cloudera/parcel-repo
+
+jpssh mkdir -p /cloudera/opt/cloudera/parcels
+jpssh chown cloudera-scm:cloudera-scm /cloudera/opt/cloudera/parcels
+
+jpssh chown -R cloudera-scm:cloudera-scm  /cloudera
+
+sudo -u cloudera-scm /cloudera/etc/init.d/cloudera-scm-server start
+
+#to run on startup #reOS
+cp /cloudera/etc/init.d/cloudera-scm-server /etc/init.d/cloudera-scm-server
+ chkconfig cloudera-scm-server on
 
