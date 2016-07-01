@@ -1,0 +1,194 @@
+- Open questions
+
+    - Can a process’ non-root effective UID write to a file in /etc/hadoop-conf
+- Parameter sections
+
+    - Globals
+
+        - LOG_ROOT=/tvlogs
+        - CDH_ROOT=/cloudera
+
+    - cm-agent ( etc/cloudera-scm-agent/config.ini )
+
+            - log_file=/var/log/cloudera-scm-agent/cloudera-scm-agent.log
+            - lib_dir=/var/lib/cloudera-scm-agent
+            - parcel_dir=/opt/cloudera/parcels
+            - agent_wide_credential_cache_location=/var/run/cloudera-scm-agent
+            - verify_cert_dir=/opt/cloudera/security/ca-certs/
+            - client_key_file=/opt/cloudera/security/x509/key.pem
+            - client_cert_file=/opt/cloudera/security/x509/cert.pem
+
+            - ## Location of Hadoop files.  These are the CDH locations when installed by
+## packages.  Unused when CDH is installed by parcels.
+[Hadoop]
+#cdh_crunch_home=/usr/lib/crunch
+#cdh_flume_home=/usr/lib/flume-ng
+#cdh_hadoop_bin=/usr/bin/hadoop
+#cdh_hadoop_home=/usr/lib/hadoop
+#cdh_hbase_home=/usr/lib/hbase
+#cdh_hbase_indexer_home=/usr/lib/hbase-solr
+#cdh_hcat_home=/usr/lib/hive-hcatalog
+#cdh_hdfs_home=/usr/lib/hadoop-hdfs
+#cdh_hive_home=/usr/lib/hive
+#cdh_httpfs_home=/usr/lib/hadoop-httpfs
+#cdh_hue_home=/usr/share/hue
+#cdh_hue_plugins_home=/usr/lib/hadoop
+#cdh_impala_home=/usr/lib/impala
+#cdh_llama_home=/usr/lib/llama
+#cdh_mr1_home=/usr/lib/hadoop-0.20-mapreduce
+#cdh_mr2_home=/usr/lib/hadoop-mapreduce
+#cdh_oozie_home=/usr/lib/oozie
+#cdh_parquet_home=/usr/lib/parquet
+#cdh_pig_home=/usr/lib/pig
+#cdh_solr_home=/usr/lib/solr
+#cdh_spark_home=/usr/lib/spark
+#cdh_sqoop_home=/usr/lib/sqoop
+#cdh_sqoop2_home=/usr/lib/sqoop2
+#cdh_yarn_home=/usr/lib/hadoop-yarn
+#cdh_zookeeper_home=/usr/lib/zookeeper
+#hive_default_xml=/etc/hive/conf.dist/hive-default.xml
+#webhcat_default_xml=/etc/hive-webhcat/conf.dist/webhcat-default.xml
+#jsvc_home=/usr/libexec/bigtop-utils
+#tomcat_home=/usr/lib/bigtop-tomcat
+
+            - #mgmt_home=/usr/share/cmf
+            - #cloudera_mysql_connector_jar=/usr/share/java/mysql-connector-java.jar
+
+    - Per-cluster
+
+        - cm-agent ( etc/cloudera-scm-agent/config.ini )
+
+            - server_host=localhost
+
+
+
+  scp -i jp.pem ec2-user@172.31.14.178:centrify-suite-2016.1-rhel4thru7-x86_64.tgz  .
+  ssh -i jp.pem ec2-user@172.31.14.178
+  yum -y install git emacs screen
+  git clone https://github.com/jvprosser/cluster-setup.git
+
+  cd cluster-setup/
+  tar xvfz pssh-2.3.1.tar.gz
+  mv pssh-2.3.1 ..
+  alias jpssh="~/pssh-2.3.1/bin/pssh --timeout=0 --inline-stdout -h ~/hostlist.txt -x '-tt' -X '-oStrictHostKeyChecking=no'"
+  alias jpscp="~/pssh-2.3.1/bin/pscp -h ~/hostlist.txt -X '-oStrictHostKeyChecking=no'"
+  mv hostlist hostlist.txt
+  jpssh ls
+
+add alias commands
+  vi ~/.bashrc
+  . ~/.bashrc
+  jpscp /home/ec2-user/jdk1.7.0_67-cloudera.tgz /tmp/
+  jpssh 'mkdir -p /usr/java; cd /usr/java; cp /tmp/jdk1.7.0_67-cloudera.tgz .;tar xvfz jdk1.7.0_67-cloudera.tgz'
+  jpssh ls /usr/java
+  jpssh ls /usr/java/jdk1.7.0_67-cloudera
+
+do this on db server
+  sudo yum install mysql-server
+  ls /etc/init.d
+
+  mv /etc/my.cnf /etc/my.cnf_orig
+
+paste contents from git
+  vi /etc/my.cnf
+  chkconfig mysqld on
+  chkconfig --list | grep my
+  service mysqld start
+  /usr/bin/mysql_secure_installation
+
+  cp /home/ec2-user/mysql-connector-java-5.1.39.tar.gz .
+  tar xvfz mysql-connector-java-5.1.39.tar.gz
+  cd mysql-connector-java-5.1.39
+
+create the cdh db grants
+  mysql -u root -p
+
+  jpssh mkdir -p /cloudera/opt/cloudera /cloudera/etc /cloudera/var
+
+  jpssh mkdir -p /cloudera/opt/cloudera-manager
+
+This needs to be here for  share/cmf/schema/scm_prepare_database.sh
+  jpssh mkdir -p /usr/share/java/
+  cd mysql-connector-java-5.1.39
+  jpscp mysql-connector-java-5.1.39-bin.jar /usr/share/java/mysql-connector-java.jar
+
+  jpssh 'useradd --system --home=/cloudera/opt/cloudera-manager/cm-5.7.1/run/cloudera-scm-server --no-create-home --shell=/bin/false --comment "Cloudera SCM User" cloudera-scm'
+  jpssh mkdir -p  /cloudera/var/lib/cloudera-scm-server
+  jpssh chown -R cloudera-scm:cloudera-scm  /cloudera
+  jpssh mkdir -p  /tvlogs/cloudera-scm-server
+  jpssh chown  cloudera-scm:cloudera-scm  /tvlogs/cloudera-scm-server
+
+  links --dump http://archive.cloudera.com/cdh5/cdh/5/ | grep cdh5.7.1 | grep tar.gz | grep http| grep -v src | cut -c 7- > cdh5.7.1-packages.txt
+  more cdh5.7.1-packages.txt
+
+  for f in [`cat cdh5.7.1-packages.txt`] ; do  wget $f;done
+
+  jpssh "sed -i -e 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config"
+  jpssh "sed -i -e 's/SELINUX=permissive/SELINUX=disabled/' /etc/selinux/config"
+
+  jpssh "echo 'options ipv6 disable=1' >> /etc/modprobe.d/disabled.conf"
+  jpssh "echo 'NETWORKING_IPV6=no' >> /etc/sysconfig/network"
+  jpssh "echo 'IPV6INIT=no' >> /etc/sysconfig/network"
+  jpssh "echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6"
+  jpssh "echo 1 > /proc/sys/net/ipv6/conf/default/disable_ipv6"
+  jpssh "echo -e 'Host *\nUseRoaming no' >> /etc/ssh/ssh_config"
+  jpssh "sed -i -e 's/#AddressFamily any/AddressFamily inet/'  /etc/ssh/sshd_config"
+  jpssh "cp /etc/rc.local /etc/sysconfig/_rc.local.orig.`date +%d%m%y%H%M%S`"
+  jpssh echo "'vm.swappiness = 1' >> /etc/sysctl.conf"
+
+see git repo
+  vi rc.local
+  jpscp rc.local /tmp
+  jpssh "cat /tmp/rc.local >> /etc/rc.local
+  jpssh "cat /tmp/rc.local >> /etc/rc.local"
+  jpssh cat /tmp/rc.local
+  jpssh shutdown -r now
+  ping 172.31.11.34
+
+  wget https://archive.cloudera.com/cm5/cm/5/cloudera-manager-centos7-cm5.7.1_x86_64.tar.gz
+
+  jpscp  cloudera-manager-centos7-cm5.7.1_x86_64.tar.gz /tmp
+
+  jpssh tar xzf /tmp/cloudera-manager-centos7-cm5.7.1_x86_64.tar.gz -C /cloudera/opt/cloudera-manager/
+
+jpssh "sed -i -e 's/# log_file=\/var\/log/log_file=\/tvlogs/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/cloudera-scm-agent/config.ini"
+jpssh "sed -i -e 's/# lib_dir=/lib_dir=\/cloudera/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/cloudera-scm-agent/config.ini"
+jpssh "sed -i -e 's/# parcel_dir=/parcel_dir=\/cloudera/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/cloudera-scm-agent/config.ini"
+
+jpssh "sed -i -e 's/# agent_wide_credential_cache_location=/agent_wide_credential_cache_location=\/cloudera/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/cloudera-scm-agent/config.ini"
+jpssh "sed -i -e  's/# verify_cert_dir=/# verify_cert_dir=\/cloudera/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/cloudera-scm-agent/config.ini"
+jpssh "sed -i -e  's/# client_key_file=/# client_key_file=\/cloudera/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/cloudera-scm-agent/config.ini"
+jpssh "sed -i -e 's/# client_cert_file=/# client_cert_file=\/cloudera/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/cloudera-scm-agent/config.ini"
+
+
+export CMHOST=72.31.11.34
+ssh ${CMHOST}  mkdir -p /tvlogs/cloudera-scm-headlamp
+ssh ${CMHOST}  mkdir -p /tvlogs/cloudera-scm-firehose
+ssh ${CMHOST}  mkdir -p /tvlogs/cloudera-scm-alertpublisher
+ssh ${CMHOST}  mkdir -p /tvlogs/cloudera-scm-eventserver
+ssh ${CMHOST}  mkdir -p /cloudera/var/lib/cloudera-scm-headlamp
+ssh ${CMHOST}  mkdir -p /cloudera/var/lib/cloudera-scm-firehose
+ssh ${CMHOST}  mkdir -p /cloudera/var/lib/cloudera-scm-alertpublisher
+ssh ${CMHOST}  mkdir -p /cloudera/var/lib/cloudera-scm-eventserver
+ssh ${CMHOST}  mkdir -p /cloudera/var/lib/cloudera-scm-server
+ssh ${CMHOST}  chown cloudera-scm:cloudera-scm  /tvlogs/cloudera-scm-headlamp
+ssh ${CMHOST}  chown cloudera-scm:cloudera-scm  /tvlogs/cloudera-scm-firehose
+ssh ${CMHOST}  chown cloudera-scm:cloudera-scm  /tvlogs/cloudera-scm-alertpublisher
+ssh ${CMHOST}  chown cloudera-scm:cloudera-scm  /tvlogs/cloudera-scm-eventserver
+ssh ${CMHOST}  chown cloudera-scm:cloudera-scm  /cloudera/var/lib/cloudera-scm-headlamp
+ssh ${CMHOST}  chown cloudera-scm:cloudera-scm  /cloudera/var/lib/cloudera-scm-firehose
+ssh ${CMHOST}  chown cloudera-scm:cloudera-scm  /cloudera/var/lib/cloudera-scm-alertpublisher
+ssh ${CMHOST}  chown cloudera-scm:cloudera-scm  /cloudera/var/lib/cloudera-scm-eventserver
+ssh ${CMHOST}  chown cloudera-scm:cloudera-scm  /cloudera/var/lib/cloudera-scm-server
+
+# these are referenced. not sure where they are defined though
+export CMF_AGENT_ROOT=/cloudera/usr/lib64/cmf
+export CMF_VAR=/cloudera/var
+export CMF_ETC=/cloudera/etc
+
+jpssh "sed -i -e 's/#USER/USER/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/default/cloudera-scm-agent"
+
+# on db host
+mysql -u root -p
+mysql> grant all on *.* to 'temp'@'%' identified by 'temp' with grant option;
+
