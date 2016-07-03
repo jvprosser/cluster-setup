@@ -107,7 +107,12 @@ jpssh yum -y install psmisc
 
   mv /etc/my.cnf /etc/my.cnf_orig
 
-#paste my.cnf contents from git or cloudera docs
+# paste my.cnf contents from git or cloudera docs
+
+# make sure the #innodb_buffer_pool_size isnot too large for your instance. ( 4G default)
+# innodb_buffer_pool_size = 512M
+# uncomment #cloudera_mysql_connector_jar
+
   vi /etc/my.cnf
   chkconfig mysqld on
   chkconfig --list | grep my
@@ -198,14 +203,11 @@ jpssh "sed -i -e  's/# verify_cert_dir=/# verify_cert_dir=\/cloudera/' /cloudera
 jpssh "sed -i -e  's/# client_key_file=/# client_key_file=\/cloudera/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/cloudera-scm-agent/config.ini"
 jpssh "sed -i -e 's/# client_cert_file=/# client_cert_file=\/cloudera/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/cloudera-scm-agent/config.ini"
 
-
-
 jpssh "sed -i -e 's/CMF_VAR=\$CMF_ROOT/CMF_VAR=\$CMF_ROOT\/var/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/default/cloudera-scm-agent"
 jpssh "sed -i -e 's/CMF_VAR=\$CMF_ROOT/CMF_VAR=\$CMF_ROOT\/var/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/default/cloudera-scm-server"
 jpssh "sed -i -e 's/export CMF_SUDO_CMD/#export CMF_SUDO_CMD/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/default/cloudera-scm-server"
 jpssh "sed -i -e 's/export CMF_SUDO_CMD/#export CMF_SUDO_CMD/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/default/cloudera-scm-agent"
 jpssh "sed -i -e 's/#USER/USER/' /cloudera/opt/cloudera-manager/cm-5.7.1/etc/default/cloudera-scm-agent"
-
 
 
 export CMHOST=cm.jprosser.com
@@ -246,7 +248,6 @@ jpssh cp -r /cloudera/opt/cloudera-manager/cm-5.7.1/share /cloudera/
 # don't make this homedir it will get moved from the cm tarbal
   jpssh 'useradd --system --home=/cloudera/run/cloudera-scm-server --no-create-home --shell=/bin/false --comment "Cloudera SCM User" cloudera-scm'
 
-
   jpssh mkdir -p /cloudera/var
 
   jpssh mkdir -p  /cloudera/var/lib/cloudera-scm-server
@@ -280,9 +281,12 @@ jpssh chown cloudera-scm:cloudera-scm /cloudera/opt/cloudera/parcels
 
 jpssh chown -R cloudera-scm:cloudera-scm  /cloudera
 
+# TODO create .bashrc in ~cloudera-scm/ and set thes env vars:
+# export CMF_ROOT=/cloudera
+# export CMF_VAR=${CMF_ROOT}/var
 sudo -u cloudera-scm /cloudera/etc/init.d/cloudera-scm-server start
 
-#to run on startup #reOS
+#to run on startup 
 cp /cloudera/etc/init.d/cloudera-scm-server /etc/init.d/cloudera-scm-server
  chkconfig cloudera-scm-server on
 
