@@ -1,7 +1,7 @@
 #!/bin/bash                                                                                                                                                                         
 
 REBOOT=$1
-REDHAT_MAJOR_VERSION=`cat /etc/redhat-release | cut -d" " -f 4 | cut -d. -f 1`
+REDHAT_MAJOR_VERSION=`cat /etc/redhat-release | cut -d" " -f 7 | cut -d. -f 1`
 yum remove OpenJDK
 yum -y install telnet wireshark tcpdump screen lynx links lsof mysql rng-tools
 yum -y install install cloudera-manager-agent
