@@ -35,8 +35,7 @@ sudo yum -y install cloudera-manager-server
 # do a yum -list | grep -i cloudera to get a list of java packages that come with the CLoudera disto.
 
 echo "install JDK"
-yum -y install oracle-j2sdk1.7
-ln -s /usr/java/jdk1.7.0_67-cloudera/ /usr/java/latest
+wget --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jdk-8u60-linux-x64.rpm" -O jdk-8-linux-x64.rpm
 
 echo "get maven"
 wget http://mirrors.sonic.net/apache/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
