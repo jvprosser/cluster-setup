@@ -1,7 +1,7 @@
 #!/bin/bash                                                                                                                                                                         
 
 REBOOT=$1
-REDHAT_MAJOR_VERSION=`cat /etc/redhat-release | cut -d" " -f 7 | cut -d. -f 1`
+REDHAT_MAJOR_VERSION=`cat /etc/redhat-release | cut -d" " -f 4 | cut -d. -f 1`
 yum remove OpenJDK
 yum -y install telnet wireshark tcpdump screen lynx links lsof mysql rng-tools
 yum -y install install cloudera-manager-agent
@@ -95,15 +95,18 @@ cat <<EOF >> /etc/rc.local
 
 ##### CDH Settings ########################################
 #disable  THP
-echo never > /sys/kernel/mm/redhat_transparent_hugepage/defrag
-echo never > /sys/kernel/mm/redhat_transparent_hugepage/enabled
+echo never > /sys/kernel/mm/transparent_hugepage/defrag
+echo never > /sys/kernel/mm/transparent_hugepage/enabled
 
 # set RPS settings
 # needs advanced network services. run this command to test and look for ixgbevf 
 # see http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/enhanced-networking.html#enhanced-networking-linux for ec2
 # ethtool -i eth0
 # driver: ixgbevf
-echo "7f" > /sys/devices/vif-0/net/eth0/queues/rx-0/rps_cpus
+
+#gce
+echo "7f" > /sys/devices/pci0000:00/0000:00:04.0/virtio1/net/eth0/queues/rx-0/rps_cpus
+#echo "7f" > /sys/devices/vif-0/net/eth0/queues/rx-0/rps_cpus
 
 # Enable TCP no delay: 
 # the TCP stack makes decisions that prefer lower latency as opposed to higher throughput.
