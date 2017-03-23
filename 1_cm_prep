@@ -55,8 +55,9 @@ gunzip  ./mysql-connector-java-5.1.41.tar.gz
 tar xvf  ./mysql-connector-java-5.1.41.tar  mysql-connector-java-5.1.41/mysql-connector-java-5.1.41-bin.jar
 
 # is this path created as a logical link using alternatives?
-mkdir -p /usr/share/java/
-sudo bash -c "cp /home/ec2-user/mysql-connector-java-5.1.38/mysql-connector-java-5.1.38-bin.jar /usr/share/java/mysql-connector-java.jar"
+jpssh mkdir -p /usr/share/java/
+jpscp /home/ec2-user/mysql-connector-java-5.1.38/mysql-connector-java-5.1.38-bin.jar /usr/share/java/
+jpssh ln -s /home/ec2-user/mysql-connector-java-5.1.38/mysql-connector-java-5.1.38-bin.jar /usr/share/java/mysql-connector-java.jar
 
 mkdir /var/log/mysql/
 chown -R mysql:mysql /var/log/mysql/
