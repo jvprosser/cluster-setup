@@ -425,6 +425,8 @@ HDFS transparent disk encryption should be configured using the Cloudera Manager
 Prior to running the wizard, 
 [ ] Make sure the jssecacerts file from /user/java/latest/jre/lib/security/jssecacerts is copied to the same location on both KMS Proxy hosts.
 
+[ ] Determine the name of the ORG  ___________ (typically part of the REALM)
+
 [ ] Make sure the nodes that will be the key trustee server are NOT part of the CDH cluster.  They will be added into their own cluster.
 
 [ ] Make sure the KEYTRUSTEE SERVER parcel has not been distributed on the CDH cluster. Remove it if has.  Otherwise the wizard will be confused and won’t ask you to create a dedicated cluster for the key trustees.
@@ -459,20 +461,22 @@ What is the entropy for each one:
 
 [ ] run init on one of the KMSs
 ```
-root@lbdp34vbn ~]# ktadmin init
+root@kmshost1 ~]# ktadmin init
 INFO:keytrustee.server.util:Creating self-signed cert
-INFO:keytrustee.util:`/usr/bin/openssl req -nodes -new -days 3650 -subj /C=US/ST=TX/L=Austin/CN=lbdp34vbn.prod.pncint.net/E=keytrustee@lbdp34vbn.prod.pncint.net -x509 -out /tmp/tmp13zxDx.csr -keyout /tmp/tmpC1Csks.key`
+INFO:keytrustee.util:`/usr/bin/openssl req -nodes -new -days 3650 -subj /C=US/ST=TX/L=Austin/CN=lbdp34vbn.prod.pncint.net/E=keytrustee@kmshost1.example-internal.net -x509 -out /tmp/tmp13zxDx.csr -keyout /tmp/tmpC1Csks.key`
 Initialized directory for 4096R/B9C9EDC386B9EC90007CDB115E25C433DF33E13C
 ```
 
 [ ] copy the signature to the other KMS so they appear to the KTS as the same host
 ```
-rsync -avP /var/lib/kms-keytrustee/keytrustee/.keytrustee/ root@<bad one>:/var/lib/kms-keytrustee/keytrustee/.keytrustee/
+rsync -avP /var/lib/kms-keytrustee/keytrustee/.keytrustee/ root@<kmshost2>:/var/lib/kms-keytrustee/keytrustee/.keytrustee/
 ```
  
 [ ] Confirm the sigs are the same
-gpg --fingerprint --homedir /var/lib/kms-keytrustee/keytrustee/.keytrustee
-
+```
+ssh kmshost1 'gpg --fingerprint --homedir /var/lib/kms-keytrustee/keytrustee/.keytrustee'
+ssh kmshost2 'gpg --fingerprint --homedir /var/lib/kms-keytrustee/keytrustee/.keytrustee'
+```
 
 ### 2	KeyTrustee Server Configuration Settings
 These settings were changed from the default during the wizard installation.
@@ -488,19 +492,20 @@ Passive Key Trustee Server TLS/SSL Server CA Certificate (PEM Format)|/opt/cloud
 Passive Key Trustee Server TLS/SSL Private Key Password|REDACTED
 
 6.2	KMS Proxy Configuration Settings
-These settings were changed from the default during the wizard installation.  The Key Trustee Organization name is QA. 
-Use the Key Trustee Servers that you just created 
-Refer to the server role assignment spreadsheet to determine the new KMS hosts.
-When the wizard asks for an ORG name: PROD (Verify what the value is for DR….)
 
-```[root@keytrustee1 ~]# keytrustee-orgtool add -n PROD -c root@localhost
+Use the Key Trustee Servers that you just created 
+
+When the wizard asks for an ORG name: <ORGNAME>
+
+```
+[root@keytrustee1 ~]# keytrustee-orgtool add -n PROD -c root@localhost
 Dropped privileges to keytrustee
 2017-04-12 11:56:44,587 - keytrustee.server.orgtool - INFO - Adding organization to database
 2017-04-12 11:56:44,590 - keytrustee.server.orgtool - INFO - Initializing random secret
 [root@keytrustee1 ~]# keytrustee-orgtool list
 Dropped privileges to keytrustee
 {
-    "PROD": {
+    "ORGNAME": {
         "auth_secret": "REDACTED",
         "contacts": [
             "root@localhost"
@@ -514,9 +519,10 @@ Dropped privileges to keytrustee
     }
 } 
 ```
+
 Property	|Value	
 | --- | --- | 
-Enable TLS/SSL for Key Management Server Proxy|Checked
+Enable TLS/SSL for Key Management Server Proxy|[x]
 Key Management Server Proxy TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
 Key Management Server Proxy TLS/SSL Server JKS Keystore File Password|
 Key Management Server Proxy TLS/SSL Certificate Trust Store File|/opt/cloudera/security/jks/truststore.jks
