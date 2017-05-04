@@ -63,9 +63,9 @@ For the servers that will run TLS-enabled listeners, you can run this command to
 openssl s_client –showcerts –connect master.example-internal.net:7183
 Check out the troubleshooting section at the end for more ideas.
 
-## 2. 	Kerberos
+## Kerberos
 Kerberos is enabled via the wizard.  Prior to running the wizard, change the following configuration setting in Cloudera Manager under Administration->Settings.  If cross-realm trust (one-way or otherwise) will be needed, get the REALM names and respective kdc hosts for each one.  The fields will look something link this:
-###  3. Wizard
+###  1. Wizard
 Property | Value 
 | --- | --- |
 Custom Kerberos Keytab Retrieval Script :| /opt/cloudera/security/keytabs/keytab_retrieval.sh 
@@ -142,7 +142,7 @@ Property	| Value
 | --- | --- | 
 Enable Kerberos Authentication for HTTP Web-Consoles|Checked (or not)
 
-### 2.	Hive
+### 3.	Hive
 
 [ ] Set the encryption method for HiveServer2 to use SASL-QOP
 
@@ -156,13 +156,13 @@ HiveServer2 Advanced Configuration Snippet (Safety Valve) for hive-site.xml| ` <
  beeline -u "jdbc:hive2://edgenode1.prod.example-internal.com:10000/default;saslQop=auth-conf;principal=hive/_HOST@PROD.EXAMPLE-INTERNAL.COM;ssl=true;sslTrustStore=/opt/cloudera/security/jks/truststore.jks"
  ```
  
-2.3	Debugging
+### 4.	Debugging
 If there is a need to troubleshoot, set these environment variables and try authenticating:
 `export KRB5_TRACE=/tmp/krbtrace.log;`
 `export JAVA_TOOL_OPTIONS=-Dsun.security.krb5.debug=true`
 
-3	LDAP
-3.1	Cloudera Manager
+## LDAP
+### 1.	Cloudera Manager
 
 Property	| Value
 | --- | --- | 
