@@ -63,5 +63,50 @@ For the servers that will run TLS-enabled listeners, you can run this command to
 openssl s_client –showcerts –connect master.example-internal.net:7183
 Check out the troubleshooting section at the end for more ideas.
 
-### 2. 	Kerberos
+## 2. 	Kerberos
 Kerberos is enabled via the wizard.  Prior to running the wizard, change the following configuration setting in Cloudera Manager under Administration->Settings.  If cross-realm trust (one-way or otherwise) will be needed, get the REALM names and respective kdc hosts for each one.  The fields will look something link this:
+
+Property | Value 
+| --- | --- |
+Custom Kerberos Keytab Retrieval Script :| /opt/cloudera/security/keytabs/keytab_retrieval.sh 
+Advanced Configuration Snippet (Safety Valve) for the Default Realm in krb5.conf :| kdc = kdchost.example-internal.net 
+ Advanced Configuration Snippet (Safety Valve) for remaining krb5.conf | EXAMPLEDEV.COM = { 
+|  | kdc = kdc1.example.com |  
+|  | kdc = kdc2.example.com |  
+|  |  } |  
+|  |  FORESTROOT.COM = { |  
+|  |  kdc = kdc3.forestroot.com |  
+|  |  kdc = kdc4.forestroot.com |  
+|  | } |  
+|  |  EXAMPLEDR.EXAMPLE-INTERNAL.NET = { |  
+|  |  kdc = kdc5.prodr.example-internal.net|  
+|   | } |  
+|   |  |  
+|   | [domain_realm] |  
+|   | .prod.example-internal.net = PROD.EXAMPLE-INTERNAL.NET |  
+|   | .example.com = EXAMPLE.COM |  
+|   | .prodr.example-internal.net = PRODR.EXAMPLE-INTERNAL.NET |  
+|   | .forestroot.com = FORESTROOT.COM |  
+|   | .example-internal.net = PROD.EXAMPLE-INTERNAL.NET |  
+|   | [capaths] |  
+|   | EXAMPLE.COM = { |  
+|   |   PROD.EXAMPLE-INTERNAL.NET = FORESTROOT.COM |  
+|    |  PROD.EXAMPLE-INTERNAL.NET = PRODR.EXAMPLE-INTERNAL.NET |  
+|     | FORESTROOT.COM = . |  
+|   | } |  
+|   | PRODR. EXAMPLE-INTERNAL.COM = { |  
+|   |  PROD.EXAMPLE-INTERNAL.NET = . |  
+|   |   FORESTROOT.COM = . |  
+|    |  EXAMPLE.COM = FORESTROOT.COM |  
+|   | } |  
+|   | FORESTROOT.COM = { |  
+|    |  PRODR. EXAMPLE-INTERNAL.COM = . |  
+|     | EXAMPLE.COM = . |  
+|     | PROD. EXAMPLE-INTERNAL.COM = PRODR. EXAMPLE-INTERNAL.COM |  
+|   | } |  
+|   | PROD.EXAMPLE-INTERNAL.NET = { |  
+|   |   EXAMPLE.COM = PRODR.EXAMPLE-INTERNAL.NET |  
+|    |  EXAMPLE.COM = FORESTROOT.COM |  
+|     | PRODR.EXAMPLE-INTERNAL.NET = . |  
+|  |  } |  
+ 
