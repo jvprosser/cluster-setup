@@ -446,8 +446,10 @@ To do this,
 ```
 
 [ ] Determine if you can ssh without a password from one KMS to the other.
+
 [ ] Before the rsync step you may need to scp the CM host’s id_rsa* to root@keytrustee2:.ssh/
 
+[ ] Identify the AD group that will have the privs to create keys. (referred to as LDAP_admingroup below)
  
 [ ] Check both hosts for entropy
 ```
@@ -524,9 +526,9 @@ Property	|Value
 | --- | --- | 
 Enable TLS/SSL for Key Management Server Proxy|[x]
 Key Management Server Proxy TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
-Key Management Server Proxy TLS/SSL Server JKS Keystore File Password|
+Key Management Server Proxy TLS/SSL Server JKS Keystore File Password|REDACTED
 Key Management Server Proxy TLS/SSL Certificate Trust Store File|/opt/cloudera/security/jks/truststore.jks
-Key Management Server Proxy TLS/SSL Certificate Trust Store Password|
+Key Management Server Proxy TLS/SSL Certificate Trust Store Password|REDACTED
 The following KMS ACLs were pasted into the configuration input text box in the wizard:
 ```
 <property><name>hadoop.kms.acl.CREATE</name><value>nobody LDAP_admingroup</value><description>
@@ -598,11 +600,12 @@ The following KMS ACLs were pasted into the configuration input text box in the 
 Make sure KMS Service has “Key Trustee KMS” selected
 Make sure the KMS jks files have the root and intermediate certs imported
 ### 6.4	Encryption Zones
-Create the encryption zone keys
+[ ] Create the encryption zone keys
+```
 hadoop key create datakey
 hadoop key create hbase
 hadoop key create solr
-
+```
 
 Create the encryption zones
 hdfs crypto -createZone -path /data -keyName datakey 
