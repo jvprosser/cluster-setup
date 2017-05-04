@@ -132,7 +132,7 @@ Enable Data Transfer Encryption| [x]
 Hadoop RPC Protection|Privacy
 DataNode HTTP Web UI Port|Reset to default (50075)
 DataNode Transceiver Port|Reset to default (50010)
-Enable Kerberos Authentication for HTTP Web-Consoles|Checked
+Enable Kerberos Authentication for HTTP Web-Consoles|[x]
 
 ### 2.	YARN
 
@@ -140,7 +140,7 @@ Enable Kerberos Authentication for HTTP Web-Consoles|Checked
 
 Property	| Value
 | --- | --- | 
-Enable Kerberos Authentication for HTTP Web-Consoles|Checked (or not)
+Enable Kerberos Authentication for HTTP Web-Consoles|[x] (or not)
 
 ### 3.	Hive
 
@@ -273,7 +273,7 @@ Property	|Value
 HBase Thrift Authentication|auth-conf
 HBase REST Authentication|Kerberos
 HBase Transport Security|Privacy
-Web UI TLS/SSL Encryption Enabled|Checked
+Web UI TLS/SSL Encryption Enabled|[x]
 HBase TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
 HBase TLS/SSL Server JKS Keystore File Password|REDACTED
 HBase TLS/SSL Server JKS Keystore Key Password|REDACTED
@@ -289,13 +289,13 @@ HBase Thrift Server over HTTP TLS/SSL Server JKS Keystore Key Password|REDACTED
 ### 2.	HDFS
 Property	|Value
 | --- | --- | 
-Enable Kerberos Authentication for HTTP Web-Consoles|Checked
+Enable Kerberos Authentication for HTTP Web-Consoles|[x]
 DataNode Data Transfer Protection|privacy
 DataNode Transceiver Port|50010
 Enable Access Control Lists|[x]
 Hadoop RPC Protection|privacy
 Enable Data Transfer Encryption|[x]
-Hadoop TLS/SSL Enabled|Checked
+Hadoop TLS/SSL Enabled|[x]
 Hadoop TLS/SSL Server Keystore File Location|/opt/cloudera/security/jks/keystore.jks
 Hadoop TLS/SSL Server Keystore File Password|REDACTED
 Hadoop TLS/SSL Server Keystore Key Password|REDACTED
@@ -310,7 +310,7 @@ HttpFS TLS/SSL Certificate Trust Store Password|REDACTED
 ### 3.	Hive
 Property	|Value
 | --- | --- | 
-Enable TLS/SSL for HiveServer2|Checked
+Enable TLS/SSL for HiveServer2|[x]
 HiveServer2 TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
 HiveServer2 TLS/SSL Server JKS Keystore File Password|REDACTED
 HiveServer2 TLS/SSL Certificate Trust Store File|/opt/cloudera/security/jks/truststore.jks
@@ -322,7 +322,7 @@ HiveServer2 WebUI TLS/SSL Server JKS Keystore File Location|/opt/cloudera/securi
 ### 4.	Impala
 Property	|Value
 | --- | --- | 
-Enable TLS/SSL for Impala|Checked
+Enable TLS/SSL for Impala|[x]
 Impala TLS/SSL Server Certificate File (PEM Format)|/opt/cloudera/security/x509/cert.pem
 Impala TLS/SSL Server Private Key File (PEM Format)|/opt/cloudera/security/x509/key.pem
 Impala TLS/SSL Private Key Password|REDACTED
@@ -366,7 +366,7 @@ Oozie TLS/SSL Certificate Trust Store Password|REDACTED
 ### 8.	Solr
 Property	|Value	
 | --- | --- | 
-Enable TLS/SSL for Solr|Checked
+Enable TLS/SSL for Solr|[x]
 Solr TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
 Solr TLS/SSL Server JKS Keystore File Password|REDACTED
 Solr TLS/SSL Certificate Trust Store File|/opt/cloudera/security/jks/truststore.jks
@@ -378,7 +378,7 @@ Property	|Value
 Hadoop TLS/SSL Server Keystore File Location|/opt/cloudera/security/jks/keystore.jks
 Hadoop TLS/SSL Server Keystore File Password|REDACTED
 Hadoop TLS/SSL Server Keystore Key Password|REDACTED
-Enable Kerberos Authentication for HTTP Web-Consoles|Checked
+Enable Kerberos Authentication for HTTP Web-Consoles|[x]
 TLS/SSL Client Truststore File Location|/opt/cloudera/security/jks/truststore.jks
 TLS/SSL Client Truststore File Password|REDACTED
 
