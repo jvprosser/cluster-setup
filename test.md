@@ -400,7 +400,8 @@ Property	|Value
 Sentry Admin group +=|LDAP_admingroup
 
 
-Add Sentry Service dependencies for 
+Add Sentry Service dependencies for:
+
  [ ] Hive
  [ ] Impala
  [ ] Solr
@@ -417,23 +418,35 @@ Add Sentry Service dependencies for
 
 
 ## HDFS Encryption at Rest
-HDFS transparent disk encryption should be configured using the Cloudera Manager wizard.  Prior to running the wizard, make sure the jssecacerts file from /user/java/latest/jre/lib/security/jssecacerts is copied to the same location on both KMS Proxy hosts.
-Also make sure the nodes that will be the key trustee server are NOT part of the CDH cluster.  They will be added into their own cluster.
-Make sure the KEYTRUSTEE SERVER parcel has not been distributed on the CDH cluster. Remove it if has.  Otherwise the wizard will be confused and won’t ask you to create a dedicated cluster for the key trustees.
-Make sure the CDH parcel has not been distributed to a KeyTrustee cluster if you have made one already.
-Prior to starting the wizard, make sure that the hosts that will run the key trustee role instances have the key trustee server parcel downloaded/distributed and activated.
+HDFS transparent disk encryption should be configured using the Cloudera Manager wizard.  
+
+Prior to running the wizard, 
+[ ] Make sure the jssecacerts file from /user/java/latest/jre/lib/security/jssecacerts is copied to the same location on both KMS Proxy hosts.
+
+[ ] Make sure the nodes that will be the key trustee server are NOT part of the CDH cluster.  They will be added into their own cluster.
+
+[ ] Make sure the KEYTRUSTEE SERVER parcel has not been distributed on the CDH cluster. Remove it if has.  Otherwise the wizard will be confused and won’t ask you to create a dedicated cluster for the key trustees.
+
+[ ] Make sure the CDH parcel has not been distributed to a KeyTrustee cluster if you have made one already.
+
+[ ] Identify the hosts that will perform the KMS roles
+```
+    
+    
+```
+
+[ ] Make sure that the hosts that will run the key trustee role instances have the key trustee server parcel downloaded/distributed and activated.
+
 To do this, copy KEYTRUSTEE_SERVER-5.10.0-1.keytrustee5.10.0.p0.26-el7.parcel and KEYTRUSTEE_SERVER-5.10.0-1.keytrustee5.10.0.p0.26-el7.parcel.sha to the CM host:/opt/cloudera/parcel-repo and then in CM parcels page click the “check for new parcels” button.
-Identify the hosts that will perform the roles:
+
  
 Continue with the wizard to add the cluster, install the parcels and select the hosts.
 Continue to follow the steps in the wizard:
-  
-
-
+ 
 Following the wizard:
  
-
-Before the rsync step you may need to scp the CM host’s id_rsa* to root@keytrustee2:.ssh/
+[ ] Determine if you can ssh without a password from one KMS to the other.
+[ ] Before the rsync step you may need to scp the CM host’s id_rsa* to root@keytrustee2:.ssh/
 
  
 Figure 1 PROD
