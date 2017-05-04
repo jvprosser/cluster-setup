@@ -457,9 +457,21 @@ What is the entropy for each one:
 ```
 [ ] if it's < 500, install the rng package, etc.
 
+[ ] run init on one of the KMSs
+```
+root@lbdp34vbn ~]# ktadmin init
+INFO:keytrustee.server.util:Creating self-signed cert
+INFO:keytrustee.util:`/usr/bin/openssl req -nodes -new -days 3650 -subj /C=US/ST=TX/L=Austin/CN=lbdp34vbn.prod.pncint.net/E=keytrustee@lbdp34vbn.prod.pncint.net -x509 -out /tmp/tmp13zxDx.csr -keyout /tmp/tmpC1Csks.key`
+Initialized directory for 4096R/B9C9EDC386B9EC90007CDB115E25C433DF33E13C
+```
 
-
+[ ] copy the signature to the other KMS so they appear to the KTS as the same host
+```
+rsync -avP /var/lib/kms-keytrustee/keytrustee/.keytrustee/ root@<bad one>:/var/lib/kms-keytrustee/keytrustee/.keytrustee/
+```
  
+[ ] Confirm the sigs are the same
+gpg --fingerprint --homedir /var/lib/kms-keytrustee/keytrustee/.keytrustee
 
 
 ### 2	KeyTrustee Server Configuration Settings
