@@ -437,10 +437,12 @@ Prior to running the wizard,
 
 [ ] Make sure that the hosts that will run the key trustee role instances have the key trustee server parcel downloaded/distributed and activated.
 
-To do this, copy KEYTRUSTEE_SERVER-5.10.0-1.keytrustee5.10.0.p0.26-el7.parcel and KEYTRUSTEE_SERVER-5.10.0-1.keytrustee5.10.0.p0.26-el7.parcel.sha to the CM host:/opt/cloudera/parcel-repo and then in CM parcels page click the “check for new parcels” button.
-
+To do this, 
+```copy KEYTRUSTEE_SERVER-5.10.0-1.keytrustee5.10.0.p0.26-el7.parcel and KEYTRUSTEE_SERVER-5.10.0-1.keytrustee5.10.0.p0.26-el7.parcel.sha to the CM host:/opt/cloudera/parcel-repo and then in CM parcels page click the “check for new parcels” button.
+```
  
 Continue with the wizard to add the cluster, install the parcels and select the hosts.
+
 Continue to follow the steps in the wizard:
  
 Following the wizard:
@@ -449,8 +451,14 @@ Following the wizard:
 [ ] Before the rsync step you may need to scp the CM host’s id_rsa* to root@keytrustee2:.ssh/
 
  
-Figure 1 PROD
+[ ] Check both hosts for entropy
+```
+ssh root@kmshost 'cat /proc/sys/kernel/random/entropy_avail'
+```
+What is the entropy for each one:
+```
 
+```
 
 
 Then ssh to the other keytrustee host and init
