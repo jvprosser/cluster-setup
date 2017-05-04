@@ -124,5 +124,15 @@ Additional Rules to Map Kerberos Principals to Short Names|RULE:[1:$1@$0](.*@\QQ
 | | RULE:[2:$1@$0](.*@\QEXAMPLE.COM\E$)s/@\QEXAMPLE.COM\E$//L
 | | DEFAULT
 
+Because Kerberos was not enabled before the CertToolKit was run, several properties need to be changed in the HDFS service after running the Kerberos wizard.
+
+Property	|Value
+| --- | --- | 
+Enable Data Transfer Encryption|Checked
+Hadoop RPC Protection|Privacy
+DataNode HTTP Web UI Port|Reset to default (50075)
+DataNode Transceiver Port|Reset to default (50010)
+Enable Kerberos Authentication for HTTP Web-Consoles|Checked
+
 
  
