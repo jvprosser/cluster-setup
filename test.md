@@ -420,6 +420,8 @@ Add Sentry Service dependencies for:
 ## HDFS Encryption at Rest
 HDFS transparent disk encryption should be configured using the Cloudera Manager wizard.  
 
+### 1. Wizard
+
 Prior to running the wizard, 
 [ ] Make sure the jssecacerts file from /user/java/latest/jre/lib/security/jssecacerts is copied to the same location on both KMS Proxy hosts.
 
@@ -440,13 +442,7 @@ Prior to running the wizard,
 To do this, 
 ```copy KEYTRUSTEE_SERVER-5.10.0-1.keytrustee5.10.0.p0.26-el7.parcel and KEYTRUSTEE_SERVER-5.10.0-1.keytrustee5.10.0.p0.26-el7.parcel.sha to the CM host:/opt/cloudera/parcel-repo and then in CM parcels page click the “check for new parcels” button.
 ```
- 
-Continue with the wizard to add the cluster, install the parcels and select the hosts.
 
-Continue to follow the steps in the wizard:
- 
-Following the wizard:
- 
 [ ] Determine if you can ssh without a password from one KMS to the other.
 [ ] Before the rsync step you may need to scp the CM host’s id_rsa* to root@keytrustee2:.ssh/
 
@@ -459,13 +455,14 @@ What is the entropy for each one:
 ```
 
 ```
+[ ] if it's < 500, install the rng package, etc.
 
 
-Then ssh to the other keytrustee host and init
+
  
 
 
-6.1	KeyTrustee Server Configuration Settings
+### 2	KeyTrustee Server Configuration Settings
 These settings were changed from the default during the wizard installation.
 Property	|Value	
 | --- | --- | 
