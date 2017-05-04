@@ -279,6 +279,48 @@ Check errors then correct then run host inspector again
 
 2.4	Assign services to hosts
 
+[ ] hdfs blocksize = 128
+
+[ ] failed volumes: half # disks
+
+[ ] Set ZooKeeper root for Kafka to /kafka
+
+[ ] Also checked Enable Kafka Monitoring (Note: Requires Kafka-1.3.0 parcel or higher)
+
+[ ] get hardware specs and fill out the Yarn Tuning guide.
+
+[ ] modify memory overcommit validation threshold if needed
+
+
+4	Benchmark/Smoketest
+
+4.1	Teragen
+```
+export HADOOP_USER_NAME=hdfs
+
+hadoop jar /opt/cloudera/parcels/CDH/jars/hadoop-examples.jar teragen -Dmapreduce.job.maps=160 10000000000 /user/hdfs/teragen1TB
+
+hdfs dfs -du -s -h /user/hdfs/teragen1TB
+
+hdfs dfs -rm -r -f -skipTrash /user/hdfs/teragen1TB
+```
+[ ] look for frame errors
+```
+[root@ log]# netstat -ina
+Kernel Interface table
+Iface      MTU    RX-OK RX-ERR RX-DRP RX-OVR    TX-OK TX-ERR TX-DRP TX-OVR Flg
+eth0      9000 16154899      1      0 0      12845469      0      0      0 BMRU
+lo       65536    23065      0      0 0         23065      0      0      0 LRU
+```
+
+
+
+
+
+
+
+
+
 
 
 
