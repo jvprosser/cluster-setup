@@ -314,13 +314,43 @@ lo       65536    23065      0      0 0         23065      0      0      0 LRU
 ```
 
 
+[ ] get job screen shots for doc
 
 
+[ ] get CM graphs screen shots for doc 
 
+[ ] Resource Pool Usage
 
+[ ] Cluster CPU/IO/Network
 
+Should see less I/O more network
 
+4.3	Terasort
+```
+hadoop jar /opt/cloudera/parcels/CDH/jars/hadoop-examples.jar terasort /user/pl75230/teragen1TB /user/pl75230/terasort1TB
+```
 
+[ ] get job screen shots for doc
+
+[ ] Resource Pool Usage
+
+[ ] Cluster CPU/IO/Network
+
+[ ] get CM graphs screen shots for doc 
+
+Should see less network more I/O
+
+4.4	TeraValidate
+```
+hadoop jar /opt/cloudera/parcels/CDH/jars/hadoop-examples.jar teravalidate /user/pl75230/terasort1TB /user/pl75230/teravalidate1TB
+```
+[ ] get job screen shots for doc
+
+[ ] Resource Pool Usage
+
+[ ] Cluster CPU/IO/Network
+
+[ ] get CM graphs screen shots for doc 
 
 
 
