@@ -128,7 +128,7 @@ Because Kerberos was not enabled before the CertToolKit was run, several propert
 
 Property	| Value
 | --- | --- | 
-Enable Data Transfer Encryption|Checked
+Enable Data Transfer Encryption| [x]
 Hadoop RPC Protection|Privacy
 DataNode HTTP Web UI Port|Reset to default (50075)
 DataNode Transceiver Port|Reset to default (50010)
@@ -136,6 +136,7 @@ Enable Kerberos Authentication for HTTP Web-Consoles|Checked
 
 2.1	YARN
 [ ]  Determine if the following YARN properties must be configured depending on whether they want to enable spnego on their desktops
+
 Property	| Value
 | --- | --- | 
 Enable Kerberos Authentication for HTTP Web-Consoles|Checked (or not)
@@ -145,12 +146,18 @@ Enable Kerberos Authentication for HTTP Web-Consoles|Checked (or not)
 
 Property	| Value
 | --- | --- | 
-HiveServer2 Advanced Configuration Snippet (Safety Valve) for hive-site.xml|<property>
+
+HiveServer2 Advanced Configuration Snippet (Safety Valve) for hive-site.xml| ``` <property>
   <name>hive.server2.thrift.sasl.qop</name>
   <value>auth-conf</value>
 </property>
-
+```
 Confirm beeline connectivity with a connection string similar to:
+ 
+ ```
+ beeline -u "jdbc:hive2://edgenode1.prod.example-internal.com:10000/default;saslQop=auth-conf;principal=hive/_HOST@PROD.EXAMPLE-INTERNAL.COM;ssl=true;sslTrustStore=/opt/cloudera/security/jks/truststore.jks"
+ ```
+ 
  
 Figure 1 PROD
 2.3	Debugging
