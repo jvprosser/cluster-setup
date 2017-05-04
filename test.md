@@ -126,7 +126,7 @@ Additional Rules to Map Kerberos Principals to Short Names|RULE:[1:$1@$0](.*@\QQ
 
 Because Kerberos was not enabled before the CertToolKit was run, several properties need to be changed in the HDFS service after running the Kerberos wizard.
 
-Property	|Value
+Property	| Value
 | --- | --- | 
 Enable Data Transfer Encryption|Checked
 Hadoop RPC Protection|Privacy
@@ -135,14 +135,15 @@ DataNode Transceiver Port|Reset to default (50010)
 Enable Kerberos Authentication for HTTP Web-Consoles|Checked
 
 2.1	YARN
-The following YARN properties must be configured
-Property	|Value
+[ ]  Determine if the following YARN properties must be configured depending on whether they want to enable spnego on their desktops
+Property	| Value
 | --- | --- | 
-Enable Kerberos Authentication for HTTP Web-Consoles|Checked (or not depending on whether they want to enable spnego on their desktops)
+Enable Kerberos Authentication for HTTP Web-Consoles|Checked (or not)
 
 2.2	Hive
-Set the encryption method for HiveServer2 to use SASL-QOP
-Property	|Value
+[ ] Set the encryption method for HiveServer2 to use SASL-QOP
+
+Property	| Value
 | --- | --- | 
 HiveServer2 Advanced Configuration Snippet (Safety Valve) for hive-site.xml|<property>
   <name>hive.server2.thrift.sasl.qop</name>
@@ -159,7 +160,8 @@ If there is a need to troubleshoot, set these environment variables and try auth
 
 3	LDAP
 3.1	Cloudera Manager
-Property	|Value
+
+Property	| Value
 | --- | --- | 
 Authentication Backend Order|External then Database
 External Authentication Type|Active Directory
