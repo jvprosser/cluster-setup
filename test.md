@@ -176,31 +176,38 @@ LDAP User Groups|ADGROUP_USER1, ADGROUP_USER2
 LDAP Full Administrator Groups|ADGROUP_ADMINS
 
 Since we are using LDAPS, there is a dependency on the default CA truststore located in /usr/java/latest/jre/lib/security/cacerts.  We will need to modify this and add our own ROOT and intermediate CAs.
+
 On the CM host
  `cd /usr/java/latest/jre/lib/security`
-Check it see if there is a file named jssccacerts
-If it’s not there you need to add it:
-`cp cacerts jssccacerts`
-then import the CA certs (root and intermediate) to the jssccacerts truststore file.
+ 
+[ ] Check it see if there is a file named jssccacerts
+
+[ ] If it’s not there, copy cacerts to it to create it.
+ `cp cacerts jssccacerts`
+
+[ ] import the CA certs (root and intermediate) to the jssccacerts truststore file.
 `keytool -alias intermediate -import -file  /opt/cloudera/security/ca-certs/INTERMEDIATE.pem  -keystore jssccacerts`
 (The password , is changeit)
 `keytool -alias root -import -file  /opt/cloudera/security/ca-certs/Root_CA.pem  -keystore jssccacerts`
 (The password , is changeit)
+
 Verify if you want:
-`/usr/java/latest/bin/keytool -list -v -keystore jssecacerts | grep -v SHA | grep –I example`
-Then restart the Cloudera manager server
+`/usr/java/latest/bin/keytool -list -v -keystore jssecacerts | less`
+
+[ ] Then restart the Cloudera manager server
 
 If you see this error:
 PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target. 
-Look at jssecacerts in `/usr/java/latest/jre/lib/security/`. The problem is that the root CA cannot be found.  
-Also try:
+
+ *. Look at jssecacerts in `/usr/java/latest/jre/lib/security/`. The problem is that the root CA cannot be found.  
+ *. Also try:
 `openssl s_client –showcerts –connect ldaps.example.com:636 `
 Look at the root CAs and make sure they match the ones you’ve been given.
 
 
 
 
-3.2	Cloudera Navigator
+### 2. Cloudera Navigator
 Property	|Value
 | --- | --- | 
 Authentication Backend Order|External then Cloudera Manager
@@ -213,35 +220,38 @@ LDAP Group Search Base|OU=AccessGroups,DC=EXAMPLE,DC=COM
 LDAP Group Search Filter For Logged In User|(member={0})
 LDAP Groups Search Filter|(&(objectClass=group)(cn=*{0}*))
 
-3.3	Hue
+### 3.	Hue
 Property	|Value
 | --- | --- | 
 Authentication Backend|desktop.auth.backend.LdapBackend
 LDAP URL|ldaps://KDC1.example.com
 Active Directory Domain|EXAMPLE.COM
-LDAP Server CA Certificate|
-|
-Use Search Bind Authentication|Checked
-Create LDAP users on login|Checked
+LDAP Server CA Certificate| TODO: FILL THIS IN
+Use Search Bind Authentication|[x]
+Create LDAP users on login|[x]
 LDAP Search Base|DC=EXAMPLE,DC=COM
 LDAP Bind User Distinguished Name|BINDACCOUNT
 LDAP Bind Password|REDACTED
-LDAP User Filter
-|(objectClass=user)
-LDAP Username Attribute
-|sAMAccountName
+LDAP User Filter|(objectClass=user)
+LDAP Username Attribute|sAMAccountName
 LDAP Group Filter|(objectClass=group)
 LDAP Group Name Attribute|cn
 
-3.4	Impala w/ LDAP
+### 4.	Impala w/ LDAP
+
 Impala was not written in Java, so it does not use /usr/java/latest/jre/lib/security/jssecacerts when authenticating with LDAP.
+
 It uses the ca-certs PEM files in /opt/cloudera/security/truststore/ca-truststore.pem
-The ROOT and intermediate certificates that signed the LDAPs server’s certificate need to be included in /opt/cloudera/security/truststore/ca-truststore.pem. So if you had to modify jssecacerts for ldap, you’ll need to modify /opt/cloudera/security/truststore/ca-truststore.pem as well.
-This new version of the truststore will need to be copied to all the nodes in the cluster since every impalad will need to talk to the LDAP server at some point.
+
+The ROOT and intermediate certificates that signed the LDAPs server’s certificate need to be included in /opt/cloudera/security/truststore/ca-truststore.pem. 
+
+So if you had to modify jssecacerts for ldap, you’ll need to modify /opt/cloudera/security/truststore/ca-truststore.pem as well.
+
+[ ] This new version of the truststore will need to be copied to all the nodes in the cluster since every impalad will need to talk to the LDAP server at some point.
 
 Property	|Value
 | --- | --- | 
-Enable LDAP Authentication|Checked
+Enable LDAP Authentication|[x]
 LDAP URL|ldaps://KDC1.example.com
 Active Directory Domain|EXAMPLE.COM
 LDAP Server CA Certificate|/opt/cloudera/security/truststore/ca-truststore.pem
@@ -251,13 +261,13 @@ Because the production LDAP server’s TLS certificate is signed by a different 
 
 Property	|Value
 | --- | --- | 
-Enable LDAP Authentication|Checked
+Enable LDAP Authentication|[x]
 LDAP URL|ldaps://KDC1.example.com
 Active Directory Domain|EXAMPLE.COM
 LDAP Server CA Truststore|/opt/cloudera/security/truststore/ca-truststore.pem
 
-4	Cluster Service Over-the-Wire Encryption
-4.1	HBase
+## Cluster Service Over-the-Wire Encryption
+### 1.	HBase
 Property	|Value
 | --- | --- | 
 HBase Thrift Authentication|auth-conf
@@ -267,37 +277,37 @@ Web UI TLS/SSL Encryption Enabled|Checked
 HBase TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
 HBase TLS/SSL Server JKS Keystore File Password|REDACTED
 HBase TLS/SSL Server JKS Keystore Key Password|REDACTED
-Enable TLS/SSL for HBase REST Server|Checked
+Enable TLS/SSL for HBase REST Server|[x]
 HBase REST Server TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
 HBase REST Server TLS/SSL Server JKS Keystore File Password|REDACTED
 HBase REST Server TLS/SSL Server JKS Keystore Key Password|REDACTED
-Enable TLS/SSL for HBase Thrift Server over HTTP|Checked
+Enable TLS/SSL for HBase Thrift Server over HTTP|[x]
 HBase Thrift Server over HTTP TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
 HBase Thrift Server over HTTP TLS/SSL Server JKS Keystore File Password|REDACTED
 HBase Thrift Server over HTTP TLS/SSL Server JKS Keystore Key Password|REDACTED
 
-4.2	HDFS
+### 2.	HDFS
 Property	|Value
 | --- | --- | 
 Enable Kerberos Authentication for HTTP Web-Consoles|Checked
 DataNode Data Transfer Protection|privacy
 DataNode Transceiver Port|50010
-Enable Access Control Lists|Checked
+Enable Access Control Lists|[x]
 Hadoop RPC Protection|privacy
-Enable Data Transfer Encryption|Checked
+Enable Data Transfer Encryption|[x]
 Hadoop TLS/SSL Enabled|Checked
 Hadoop TLS/SSL Server Keystore File Location|/opt/cloudera/security/jks/keystore.jks
 Hadoop TLS/SSL Server Keystore File Password|REDACTED
 Hadoop TLS/SSL Server Keystore Key Password|REDACTED
 Cluster-Wide Default TLS/SSL Client Truststore Location|/opt/cloudera/security/jks/truststore.jks
 Cluster-Wide Default TLS/SSL Client Truststore Password|changeit
-Enable TLS/SSL for HttpFS|Checked
+Enable TLS/SSL for HttpFS|[x]
 HttpFS TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
 HttpFS TLS/SSL Server JKS Keystore File Password|REDACTED
 HttpFS TLS/SSL Certificate Trust Store File|/opt/cloudera/security/jks/truststore.jks
 HttpFS TLS/SSL Certificate Trust Store Password|REDACTED
 
-4.3	Hive
+### 3.	Hive
 Property	|Value
 | --- | --- | 
 Enable TLS/SSL for HiveServer2|Checked
@@ -305,11 +315,11 @@ HiveServer2 TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks
 HiveServer2 TLS/SSL Server JKS Keystore File Password|REDACTED
 HiveServer2 TLS/SSL Certificate Trust Store File|/opt/cloudera/security/jks/truststore.jks
 HiveServer2 TLS/SSL Certificate Trust Store Password|REDACTED
-Enable TLS/SSL for HiveServer2 WebUI|Checked
+Enable TLS/SSL for HiveServer2 WebUI|[x]
 HiveServer2 WebUI TLS/SSL Server JKS Keystore File Password|REDACTED
 HiveServer2 WebUI TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
 
-4.4	Impala
+### 4.	Impala
 Property	|Value
 | --- | --- | 
 Enable TLS/SSL for Impala|Checked
@@ -320,7 +330,7 @@ Impala TLS/SSL CA Certificate|/opt/cloudera/security/ca-certs/ root-ca.pem
 Catalog Server Webserver TLS/SSL Server Certificate File (PEM Format)|/opt/cloudera/security/x509/cert.pem
 Catalog Server Webserver TLS/SSL Server Private Key File (PEM Format)|/opt/cloudera/security/x509/key.pem
 Catalog Server Webserver TLS/SSL Private Key Password|REDACTED
-Disk Spill Encryption|Checked
+Disk Spill Encryption|[x]
 Impala Daemon Webserver TLS/SSL Server Certificate File (PEM Format)|/opt/cloudera/security/x509/cert.pem
 Impala Daemon Webserver TLS/SSL Server Private Key File (PEM Format)|/opt/cloudera/security/x509/key.pem
 Impala Daemon Webserver TLS/SSL Private Key Password|REDACTED
@@ -328,32 +338,32 @@ StateStore Webserver TLS/SSL Server Certificate File (PEM Format)|/opt/cloudera/
 StateStore Webserver TLS/SSL Server Private Key File (PEM Format)|/opt/cloudera/security/x509/key.pem
 StateStore Webserver TLS/SSL Private Key Password|REDACTED
 
-4.5	Kafka
+### 5.	Kafka
 Property		|Value	
 | --- | --- | 
-Enable TLS/SSL for Kafka Broker|Checked
+Enable TLS/SSL for Kafka Broker|[x]
 Kafka Broker TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
 Kafka Broker TLS/SSL Server JKS Keystore File Password|REDACTED
 Kafka Broker TLS/SSL Server JKS Keystore Key Password|REDACTED
 Kafka Broker TLS/SSL Certificate Trust Store File|/opt/cloudera/security/jks/truststore.jks
 Kafka Broker TLS/SSL Certificate Trust Store Password|REDACTED
 
-4.6	Key-Value Store
+### 6.	Key-Value Store
 Property	|Value	
 | --- | --- | 
 HBase Indexer TLS/SSL Certificate Trust Store File|/opt/cloudera/security/jks/truststore.jks
 HBase Indexer TLS/SSL Certificate Trust Store Password|REDACTED
 
-4.7	Oozie
+### 7.	Oozie
 Property	|Value	
 | --- | --- | 
-Enable TLS/SSL for Oozie |Checked
+Enable TLS/SSL for Oozie |[x]
 Oozie TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
 Oozie TLS/SSL Server JKS Keystore File Password|REDACTED
 Oozie TLS/SSL Certificate Trust Store File|/opt/cloudera/security/jks/truststore.jks
 Oozie TLS/SSL Certificate Trust Store Password|REDACTED
 
-4.8	Solr
+### 8.	Solr
 Property	|Value	
 | --- | --- | 
 Enable TLS/SSL for Solr|Checked
@@ -362,7 +372,7 @@ Solr TLS/SSL Server JKS Keystore File Password|REDACTED
 Solr TLS/SSL Certificate Trust Store File|/opt/cloudera/security/jks/truststore.jks
 Solr TLS/SSL Certificate Trust Store Password|REDACTED
 
-4.9	YARN
+### 9.	YARN
 Property	|Value
 | --- | --- | 
 Hadoop TLS/SSL Server Keystore File Location|/opt/cloudera/security/jks/keystore.jks
@@ -372,29 +382,41 @@ Enable Kerberos Authentication for HTTP Web-Consoles|Checked
 TLS/SSL Client Truststore File Location|/opt/cloudera/security/jks/truststore.jks
 TLS/SSL Client Truststore File Password|REDACTED
 
-5	Sentry
+## Sentry
 Installed service on host master1.example-internal.net.  Make sure the database-connector-java.jar is  a supported version.  
 
-5.1	HDFS Sentry Configuration
+### 1.	HDFS Sentry Configuration
+
 Property	|Value	
 | --- | --- | 
-Enable Sentry Synchronization|Checked
+Enable Sentry Synchronization|[x]
 Sentry Synchronization Path Prefixes|/user/hive/warehouse
-/otherdata
+|  |/otherdata
 Sentry Admin group|LDAP_admingroup
 
-5.2	Sentry Configuration
+### 2.	Sentry Configuration
 Property	|Value	
 | --- | --- | 
 Sentry Admin group +=|LDAP_admingroup
 
 
-Add Sentry Service dependencies for Hive, Impala, Solr, Hue, Kafka
-On HiveServer2 make sure Impersonation is disabled.
-Log into beeline and set up the DBA role for the sentry admin group
-create role platform_admin;
-grant all on server server1 to platform_admin; grant role platform_admin to group LDAP_admingroup;
-6	HDFS Encryption at Rest
+Add Sentry Service dependencies for 
+ [ ] Hive
+ [ ] Impala
+ [ ] Solr
+ [ ] Hue
+ [ ] Kafka
+
+ [ ] On HiveServer2 make sure Impersonation is disabled.
+ 
+ [ ] Log into beeline and set up the DBA role for the sentry admin group
+ 
+[ ] create role platform_admin;
+
+`grant all on server server1 to platform_admin; grant role platform_admin to group LDAP_admingroup;`
+
+
+## HDFS Encryption at Rest
 HDFS transparent disk encryption should be configured using the Cloudera Manager wizard.  Prior to running the wizard, make sure the jssecacerts file from /user/java/latest/jre/lib/security/jssecacerts is copied to the same location on both KMS Proxy hosts.
 Also make sure the nodes that will be the key trustee server are NOT part of the CDH cluster.  They will be added into their own cluster.
 Make sure the KEYTRUSTEE SERVER parcel has not been distributed on the CDH cluster. Remove it if has.  Otherwise the wizard will be confused and won’t ask you to create a dedicated cluster for the key trustees.
