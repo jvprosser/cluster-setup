@@ -110,3 +110,19 @@ Advanced Configuration Snippet (Safety Valve) for the Default Realm in krb5.conf
 |     | PRODR.EXAMPLE-INTERNAL.NET = . |  
 |  |  } |  
  
+ Even though the custom keytab retrieval script is being used, be sure to follow the pre-requisite to install the openldap-clients package with yum or the wizard will fail.
+[ ] `yum install openldap-clients`
+[ ] Start the wizard
+
+After completing the wizard, add the following configuration to the HDFS service to map Kerberos principal names to lowercase and strip off the realm. In the case below, some users are coming in from EXAMPLE-INTERNAL.COM but some are also coming in from EXAMPLE.COM so we need to take care of them as well.
+
+Property	|Value
+| --- | --- | 
+Additional Rules to Map Kerberos Principals to Short Names|RULE:[1:$1@$0](.*@\QQA.EXAMPLE-INTERNAL.NET\E$)s/@\QQA.EXAMPLE-INTERNAL.NET\E$//L
+| | RULE:[2:$1@$0](.*@\QQA.EXAMPLE-INTERNAL.NET\E$)s/@\QQA.EXAMPLE-INTERNAL.NET\E$//L
+| | RULE:[1:$1@$0](.*@\QEXAMPLE.COM\E$)s/@\QEXAMPLE.COM\E$//L
+| | RULE:[2:$1@$0](.*@\QEXAMPLE.COM\E$)s/@\QEXAMPLE.COM\E$//L
+| | DEFAULT
+
+
+ 
