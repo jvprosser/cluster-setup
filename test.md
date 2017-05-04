@@ -111,7 +111,9 @@ Advanced Configuration Snippet (Safety Valve) for the Default Realm in krb5.conf
 |  |  } |  
  
  Even though the custom keytab retrieval script is being used, be sure to follow the pre-requisite to install the openldap-clients package with yum or the wizard will fail.
+ 
 [ ] `yum install openldap-clients`
+
 [ ] Start the wizard
 
 After completing the wizard, add the following configuration to the HDFS service to map Kerberos principal names to lowercase and strip off the realm. In the case below, some users are coming in from EXAMPLE-INTERNAL.COM but some are also coming in from EXAMPLE.COM so we need to take care of them as well.
@@ -128,7 +130,7 @@ Because Kerberos was not enabled before the CertToolKit was run, several propert
 
 Property	| Value
 | --- | --- | 
-Enable Data Transfer Encryption| [x]
+Enable Data Transfer Encryption| [ x ]
 Hadoop RPC Protection|Privacy
 DataNode HTTP Web UI Port|Reset to default (50075)
 DataNode Transceiver Port|Reset to default (50010)
@@ -186,8 +188,10 @@ On the CM host
  `cp cacerts jssccacerts`
 
 [ ] import the CA certs (root and intermediate) to the jssccacerts truststore file.
+
 `keytool -alias intermediate -import -file  /opt/cloudera/security/ca-certs/INTERMEDIATE.pem  -keystore jssccacerts`
 (The password , is changeit)
+
 `keytool -alias root -import -file  /opt/cloudera/security/ca-certs/Root_CA.pem  -keystore jssccacerts`
 (The password , is changeit)
 
@@ -203,9 +207,6 @@ PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderExce
  *. Also try:
 `openssl s_client –showcerts –connect ldaps.example.com:636 `
 Look at the root CAs and make sure they match the ones you’ve been given.
-
-
-
 
 ### 2. Cloudera Navigator
 Property	|Value
@@ -607,16 +608,23 @@ hadoop key create hbase
 hadoop key create solr
 ```
 
-Create the encryption zones
+[ ] Create the encryption zones for new data
+```
 hdfs crypto -createZone -path /data -keyName datakey 
 hdfs crypto -createZone -path /keystore -keyName keystore_key
+```
+
 Because HBase and Solr were already initialized, those services will have to be stopped and because there was no data in the existing directories, the existing /hbase and /solr directories were renamed to be /hbase_orig and /solr_orig .  /hbase and /solr were then created and the encryption zones were created. Then the contents of the orig directories were copied over and then the orig directories were removed.
-The following commands created the encryption zones
+
+[ ] create the encryption zones for existing data
+```
 hdfs crypto -createZone -path /hbase -keyName hbase_key
 hdfs crypto -createZone -path /solr -keyName solr_key
 hdfs crypto -createZone -path /user/hive/warehouse -keyName datakey 
+```
 
   ### 6.5	Missing encryption keys
+  
 During the installation process, it was discovered that some of the keys were no longer showing up with the Hadoop key –list command.
 Cloudera support ask PNC to turn off each KMS and retry the listing.  When lbdp34wbn.prod.pncint.net was the active KMS the keys appeared.  But it did not appear when lbdp34xbn.prod.pncint.net.
 The reason for this was because due to an installation error, the two KMSs had different identities from the perspective of the KTS.
@@ -640,20 +648,22 @@ uid                  keytrustee (client) <km
 sub   4096R/CF52690D 2016-03-15
 ```
 The solution was to replicate the signature on one of the KMSs onto the other one so they would be perceived as the same identity by the KTS.  The first step was to first determine if any of the keys were critical and if there were critical keys on both KMSs. 
+
 In this case there is only one critical key on one of the KMS instances.
 The process to correct this involved the following steps:
-1.	Shut down both KMSs
-2.	Ssh onto the ‘good’ KMS
-3.	Rsync the signature files onto the ‘bad’ one
+
+ 1.	Shut down both KMSs
+ 2.	Ssh onto the ‘good’ KMS
+ 3.	Rsync the signature files onto the ‘bad’ one
 `rsync -avP /var/lib/kms-keytrustee/keytrustee/.keytrustee/ root@<bad one>:/var/lib/kms-keytrustee/keytrustee/.keytrustee/`
-4.	Confirm the sigs are the same
+ 4.	Confirm the sigs are the same
 `gpg --fingerprint --homedir /var/lib/kms-keytrustee/keytrustee/.keytrustee`
 
-5.	Restart the KMS
+ 5.	Restart the KMS
 
-7	Appendix
+##	Appendix
 
-7.1	Troubleshooting
+### 1.	Troubleshooting
 Message: [24/Apr/2017 07:05:31 -0700] WARNING  Caught LDAPError while authenticating jprosser: SERVER_DOWN({'info': "TLS error -8179:Peer's Certificate issuer is not recognized.", 'desc': "Can't contact LDAP server"},)
 
 
