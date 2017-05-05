@@ -3,7 +3,7 @@
 ## 1. TLS
 
   ### 1. 	Preparation
-  * Confirm the installation of or Download and install the Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files from the Oracle website into /usr/java/latest/jre/lib/security
+ - [ ] Confirm the installation of or Download and install the Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files from the Oracle website into /usr/java/latest/jre/lib/security
 
 Private and public key pairs and CSRs for all hosts can be generated using the Cloudera Professional Services Certificate ToolKit.   Download and install this toolkit.  For this example, the toolkit directory will be named CertToolkit-master.
 
@@ -14,7 +14,7 @@ Within that directory is a file called defaults.yaml.
 This file should be reviewed and modified as needed for your environment, but you should make sure that he JAVA and CM information is correct, and also make sure TLS_LEVEL=3
 
  ### 2. 	Subject Alternative Name
-  * Find out if there is a load balancer in front of the cluster and whether its doing pass-through.  The certificates need to know about the VIP front-end’s hostname's Subject Alternate Name section.
+ - [ ]  Find out if there is a load balancer in front of the cluster and whether its doing pass-through.  The certificates need to know about the VIP front-end’s hostname's Subject Alternate Name section.
   
 Subject Alternative Name extensions should be set on any of the CSRs that will be behind the VIP.
 
@@ -23,6 +23,14 @@ They are specified using the following configuration entry in the defaults.yaml 
 `CERT_ALT_NAMES_FILE: alt_names.txt`
 
 The alt_names.txt file contains mappings from each back-end hostname to the hostnames that will be assigned to the load-balancer VIPs in front of them.  These include the actual VIP names (e.g. hueVIP-prod.example-internal.net) as well any global aliases (e.g. hbaseVIP.example-internal.net) and short hostname-only variants (e.g. hbaseVIP) along with the FQDN of the host itself.  Below is an example
+
+Each SAN in the list must be either one of these forms: DNS:fqdn or IP:ip_address.
+Example: CERT_ALT_NAMES_FILE: /home/webadmin/alt_names.txt
+Example of the alternate name file contents:
+
+ > host_SHORT_name comma_separated_list_of_san_entries
+ > host-1 DNS:cloudera-manager.example.com,IP:10.12.13.14
+
 
 Example alt_names.txt:
 
@@ -40,7 +48,7 @@ Make sure you have the complete chain. You can do this via:
 
  `openssl x509 –noout –text –in ROOT-CA-certname.pem`
  
-Make sure all the nodes in the cluster are all actively participating and are not decommissioned or otherwise disabled.  If any python errors occurred, the script crashed and did not complete.  Remove any offending nodes from the cluster and re-run the command
+ - [ ] Make sure all the nodes in the cluster are all actively participating and are not decommissioned or otherwise disabled.  If any python errors occurred, the script crashed and did not complete.  Remove any offending nodes from the cluster and re-run the command
 
   ####	Run the script to enable TLS:
 Using this command:
