@@ -112,9 +112,9 @@ Advanced Configuration Snippet (Safety Valve) for the Default Realm in krb5.conf
  
  Even though the custom keytab retrieval script is being used, be sure to follow the pre-requisite to install the openldap-clients package with yum or the wizard will fail.
  
-[ ] `yum install openldap-clients`
+ - [ ] `yum install openldap-clients`
 
-[ ] Start the wizard
+ - [ ] Start the wizard
 
 After completing the wizard, add the following configuration to the HDFS service to map Kerberos principal names to lowercase and strip off the realm. In the case below, some users are coming in from EXAMPLE-INTERNAL.COM but some are also coming in from EXAMPLE.COM so we need to take care of them as well.
 
@@ -138,7 +138,7 @@ Enable Kerberos Authentication for HTTP Web-Consoles|[x]
 
 ### 2.	YARN
 
-[ ]  Determine if the following YARN properties must be configured depending on whether they want to enable spnego on their desktops
+ - [ ]  Determine if the following YARN properties must be configured depending on whether they want to enable spnego on their desktops
 
 Property	| Value
 | --- | --- | 
@@ -146,14 +146,14 @@ Enable Kerberos Authentication for HTTP Web-Consoles|[x] (or not)
 
 ### 3.	Hive
 
-[ ] Set the encryption method for HiveServer2 to use SASL-QOP
+ - [ ] Set the encryption method for HiveServer2 to use SASL-QOP
 
 Property	| Value
 | --- | --- | 
 HiveServer2 Advanced Configuration Snippet (Safety Valve) for hive-site.xml| ` <property>  <name>hive.server2.thrift.sasl.qop</name>  <value>auth-conf</value></property>`
 
 
-[ ] Confirm beeline connectivity with a connection string similar to:
+ - [ ] Confirm beeline connectivity with a connection string similar to:
  ```
  beeline -u "jdbc:hive2://edgenode1.prod.example-internal.com:10000/default;saslQop=auth-conf;principal=hive/_HOST@PROD.EXAMPLE-INTERNAL.COM;ssl=true;sslTrustStore=/opt/cloudera/security/jks/truststore.jks"
  ```
@@ -182,12 +182,12 @@ Since we are using LDAPS, there is a dependency on the default CA truststore loc
 On the CM host
  `cd /usr/java/latest/jre/lib/security`
  
-[ ] Check it see if there is a file named jssccacerts
+ - [ ] Check it see if there is a file named jssccacerts
 
-[ ] If it’s not there, copy cacerts to it to create it.
+ - [ ] If it’s not there, copy cacerts to it to create it.
  `cp cacerts jssccacerts`
 
-[ ] import the CA certs (root and intermediate) to the jssccacerts truststore file.
+ - [ ] import the CA certs (root and intermediate) to the jssccacerts truststore file.
 
 `keytool -alias intermediate -import -file  /opt/cloudera/security/ca-certs/INTERMEDIATE.pem  -keystore jssccacerts`
 (The password , is changeit)
@@ -663,7 +663,7 @@ The process to correct this involved the following steps:
 
 ##	Appendix
 
-### 1.	Troubleshooting
+### 1.	TLS Troubleshooting
 Message: [24/Apr/2017 07:05:31 -0700] WARNING  Caught LDAPError while authenticating jprosser: SERVER_DOWN({'info': "TLS error -8179:Peer's Certificate issuer is not recognized.", 'desc': "Can't contact LDAP server"},)
 
 
