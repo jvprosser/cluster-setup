@@ -145,7 +145,7 @@ echo "1" > /proc/sys/net/ipv4/tcp_low_latency
 
  ### 1.    Prepare CM Server
 
-   - [ ] Start CM Server
+ - [ ] Start CM Server
 
    ```
      service cloudera-scm-server start
@@ -153,14 +153,14 @@ echo "1" > /proc/sys/net/ipv4/tcp_low_latency
     tail -f /var/log/cloudera-scm-server/cloudera-scm-server.log
     ```
 
-   - [ ] Start CM Agents
+ - [ ] Start CM Agents
 
   ```
     service cloudera-scm-agent start
     tail -f /var/log/cloudera-scm-agent/cloudera-scm-agent.log
   ```
 
-   - [ ] Login to CM Web UI  (Use Chrome)
+ - [ ] Login to CM Web UI  (Use Chrome)
 
 ```
     http://lbdp15abu.uat.example.com:7180
@@ -169,11 +169,11 @@ echo "1" > /proc/sys/net/ipv4/tcp_low_latency
 
     Accept the license
 ```
-   - [ ]  Install CM Agent on all remaining hosts (Note: it may already be installed)
+ - [ ]  Install CM Agent on all remaining hosts (Note: it may already be installed)
 
    `pssh sudo yum install cloudera-manager-agent cloudera-manager-daemons`
 
-   - [ ] Edit the scm agent configuration to point to CM server
+ - [ ] Edit the scm agent configuration to point to CM server
 
     `pssh sed -i '3s/.*/server_host= cmhostexample.com/' /etc/cloudera-scm-agent/config.ini`
 
@@ -182,32 +182,32 @@ echo "1" > /proc/sys/net/ipv4/tcp_low_latency
     `for h in `cat ~pl38360/hosts.txt`; do echo $h; ssh $h sed -i \'3s/.*/server_host= cmhostexample.com/\' /etc/cloudera-scm-agent/config.ini ; done`
 
 
-  - [ ] Restart CM Agent
+ - [ ] Restart CM Agent
 ```
     service cloudera-scm-agent restart
     tail -f /var/log/cloudera-scm-agent/cloudera-scm-agent.log
 ```
 
-  - [ ] CM, go 'Back' to have all the nodes show up in the list of nodes to add
+ - [ ] CM, go 'Back' to have all the nodes show up in the list of nodes to add
 
       Click 'Currently Managed Hosts' tab
       Ensure all expected nodes are included in the list.
       Select (place checkmark) on all nodes. Click 'Continue'
       On the next screen, click 'More Options'
  
-   - [ ] Add internal CDH parcel repository if needed
+ - [ ] Add internal CDH parcel repository if needed
 
-   - [ ]    Resolve host inspector issues
+ - [ ]    Resolve host inspector issues
 
 
 ###    4.    Assign services to hosts
 
-  - [ ] hdfs blocksize = 128
-  - [ ] failed volumes: half # disks
-  - [ ] Set ZooKeeper root for Kafka to /kafka
-  - [ ] Also checked Enable Kafka Monitoring (Note: Requires Kafka-1.3.0 parcel or higher)
-  - [ ] get hardware specs and fill out the Yarn Tuning guide.
-  - [ ] modify memory overcommit validation threshold if needed
+ - [ ] hdfs blocksize = 128
+ - [ ] failed volumes: half # disks
+ - [ ] Set ZooKeeper root for Kafka to /kafka
+ - [ ] Also checked Enable Kafka Monitoring (Note: Requires Kafka-1.3.0 parcel or higher)
+ - [ ] get hardware specs and fill out the Yarn Tuning guide.
+ - [ ] modify memory overcommit validation threshold if needed
 
 
 ##    Benchmark/Smoketest
@@ -222,8 +222,10 @@ echo "1" > /proc/sys/net/ipv4/tcp_low_latency
 
     hdfs dfs -rm -r -f -skipTrash /user/hdfs/teragen1TB
     ```
-     - [ ] look for frame errors
-    ```
+
+- [ ] look for frame errors
+ 
+  ```
     [root@ log]# netstat -ina
     Kernel Interface table
     Iface      MTU    RX-OK RX-ERR RX-DRP RX-OVR    TX-OK TX-ERR TX-DRP TX-OVR Flg
@@ -232,17 +234,17 @@ echo "1" > /proc/sys/net/ipv4/tcp_low_latency
     ```
 
 
-     - [ ] get job screen shots for doc
-     - [ ] get CM graphs screen shots for doc
-     - [ ] Resource Pool Usage
-     - [ ] Cluster CPU/IO/Network
+  - [ ] get job screen shots for doc
+  - [ ] get CM graphs screen shots for doc
+  - [ ] Resource Pool Usage
+  - [ ] Cluster CPU/IO/Network
 
-    Should see less I/O more network
+  Should see less I/O more network
 
 ###    2.    Terasort
-    ```
+  ```
     hadoop jar /opt/cloudera/parcels/CDH/jars/hadoop-examples.jar terasort /user/pl75230/teragen1TB /user/pl75230/terasort1TB
-    ```
+  ```
 
   - [ ] get job screen shots for doc
   - [ ] Resource Pool Usage
