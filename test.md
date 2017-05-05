@@ -130,11 +130,11 @@ Because Kerberos was not enabled before the CertToolKit was run, several propert
 
 Property	| Value
 | --- | --- | 
-Enable Data Transfer Encryption| [ x ]
+Enable Data Transfer Encryption|  - [ x ]
 Hadoop RPC Protection|Privacy
 DataNode HTTP Web UI Port|Reset to default (50075)
 DataNode Transceiver Port|Reset to default (50010)
-Enable Kerberos Authentication for HTTP Web-Consoles|[x]
+Enable Kerberos Authentication for HTTP Web-Consoles| - [ x ]
 
 ### 2.	YARN
 
