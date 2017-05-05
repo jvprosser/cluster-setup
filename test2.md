@@ -10,6 +10,7 @@
  - [ ] pssh 'df –h'
  - [ ] pssh "dmesg | egrep -i 'sense error|ata bus error'"
  - [ ] pssh check_disks.sh
+
 ```
 #!/bin/bash
 N = $1
@@ -31,6 +32,7 @@ done
 
  - [ ] pssh cat /etc/sysctl.conf | ess
  - [ ] Check and fix swappiness
+
 ```
 pssh "sed -i 's/vm.swappiness = 0/vm.swappiness = 1/g' /etc/sysctl.conf"
 ```
@@ -47,6 +49,7 @@ pssh "sed -i 's/vm.swappiness = 0/vm.swappiness = 1/g' /etc/sysctl.conf"
  > `echo “7f” > /sys/devices/????/net/eth0/queues/rx-0/rps_cpus`
 
  - [ ]   Enable TCP no delay:
+
 ```
 # the TCP stack makes decisions that prefer lower latency as opposed to higher throughput.
 echo "1" > /proc/sys/net/ipv4/tcp_low_latency
@@ -104,8 +107,6 @@ echo "1" > /proc/sys/net/ipv4/tcp_low_latency
     ### Install CM server and agent on CM Node
 
      - [ ]  yum install cloudera-manager-daemons cloudera-manager-server
-
-
      - [ ] Install CM agent on CM Node
     yum install cloudera-manager-agent cloudera-manager-daemons
 
@@ -116,10 +117,7 @@ echo "1" > /proc/sys/net/ipv4/tcp_low_latency
 ###    6.    Prepare RDBMS
 
      - [ ] Check connectivity to RDBMS via telnet
-
-
-
-      - [ ] Run SCM Backend db prepare statement
+     - [ ] Run SCM Backend db prepare statement
 
  >     If successful, you should see the following:
  >     ```
