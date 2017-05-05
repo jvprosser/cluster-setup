@@ -35,13 +35,23 @@ done
 
 ```
 pssh "sed -i 's/vm.swappiness = 0/vm.swappiness = 1/g' /etc/sysctl.conf"
+echo 1 > /proc/sys/vm/swappiness
 ```
+#### check rc.local
+- [ ]  check THP 
+
+ > ```
+ >  cat /sys/kernel/mm/transparent_hugepage/defrag always madvise [never]   It should indicate [never] which means it's disabled
+ >
+ >     vi /etc/rc.local You should see these lines: 
+ > # Begin Hadoop Configuration parameters e
+ > echo never > /sys/kernel/mm/transparent_hugepage/defrag
+ >     # End Hadoop Configuration parameters
+ > ```
 
  - [ ]  systemctl status firewalld.service
  - [ ]  check SELINUX
- #### Check /etc/rc.local
-  - [ ]  THP
- > `pssh "sed -i 's/vm.swappiness = 0/vm.swappiness = 1/g' /etc/sysctl.conf"`
+
 
 #### Optional network performance improvements that could be made
  - [ ]  Receive Packet Steering – can help to offload  packet processing. Helps to prevent the hardware queue of a single network interface card from becoming a bottleneck in network traffic.
@@ -61,35 +71,35 @@ echo "1" > /proc/sys/net/ipv4/tcp_low_latency
  - [ ]  cat /etc/resolv.conf
  - [ ]  cat /etc/nsswitch.conf | grep hosts:
  - [ ]  cat /etc/host.conf
-     - [ ]  dig @<resolverip>   <hostname>
-     - [ ]  host <hostip>
-     - [ ]  dig -x hostip
-     - [ ]  nslookup <hostname>
-     - [ ]  ping -c 2 localhost
-     - [ ]  lsmod | grep ipv6
-     - [ ]  cat /etc/sysconfig/network
-     - [ ]  ethtool eth0 | grep Speed
-     - [ ]  ethtool –S eth0 | grep collision
-     - [ ]  ethtool –S eth0 | grep drop
+ - [ ]  dig @resolverip   hostname
+ - [ ]  host hostip
+ - [ ]  dig -x hostip
+ - [ ]  nslookup hostname
+ - [ ]  ping -c 2 localhost
+ - [ ]  lsmod | grep ipv6
+ - [ ]  cat /etc/sysconfig/network
+ - [ ]  ethtool eth0 | grep Speed
+ - [ ]  ethtool –S eth0 | grep collision
+ - [ ]  ethtool –S eth0 | grep drop
 
+ >     NOTE: Consider running a DNS caching server (or more than one) inside the cluster for performance reasons.
+ >     check for multiple host groups. look for differences and resolve if needed.
+ >     Check errors then correct then run host inspector again
+### 4.    Validate Java
 
- ### 4.    Validate Java
-
-
-    UAT Cloudera Installation
-
-     - [ ]  Install  JDBC driver on CM server
-     - [ ]  Check jdbc driver exists on all nodes that have services that connects to Oracle
+   UAT Cloudera Installation
+   - [ ]  Install  JDBC driver on CM server
+   - [ ]  Check jdbc driver exists on all nodes that have services that connects to Oracle
 
     If nodes do not have it  we need to install by copying from one of the nodes
 
     then move the file from /tmp to /usr/share/java on that node
     mv /tmp/RDBMS-connector-java.jar /usr/share/java/RDBMS-connector-java.jar
 
-    ### 5.    Validate Cloudera software install
+### 5.    Validate Cloudera software install
 
-    #### Setup repository
-     - [ ]  Check repo to make sure it points to the correct internal site:
+#### Setup repository
+ - [ ]  Check repo to make sure it points to the correct internal site:
 
 ```
     $ cat /etc/yum.repos.d/Cloudera_Manager.repo
@@ -104,22 +114,21 @@ echo "1" > /proc/sys/net/ipv4/tcp_low_latency
 ```
 
 
-    ### Install CM server and agent on CM Node
+### Install CM server and agent on CM Node
+   - [ ]  yum install cloudera-manager-daemons cloudera-manager-server
+   - [ ] Install CM agent on CM Node
+`   yum install cloudera-manager-agent cloudera-manager-daemons`
 
-     - [ ]  yum install cloudera-manager-daemons cloudera-manager-server
-     - [ ] Install CM agent on CM Node
-    yum install cloudera-manager-agent cloudera-manager-daemons
-
-     - [ ] Edit the scm agent configuration to point to CM server
+   - [ ] Edit the scm agent configuration to point to CM server
 
  >  `sed -i '3s/.*/server_host= cmhost.example.com/' /etc/cloudera-scm-agent/config.ini`
 
 ###    6.    Prepare RDBMS
 
-     - [ ] Check connectivity to RDBMS via telnet
-     - [ ] Run SCM Backend db prepare statement
-
- >     If successful, you should see the following:
+   - [ ] Check connectivity to RDBMS via telnet
+   - [ ] Run SCM Backend db prepare statement
+ 
+ If successful, you should see the following:
  >     ```
  >     [root@CMHOST ~]# /usr/share/cmf/schema/scm_prepare_database.sh -h oracle-scan.qa.example.com oracle bdpdb10q_svc.qa.example.com cman
  >     Enter SCM password:
@@ -136,23 +145,22 @@ echo "1" > /proc/sys/net/ipv4/tcp_low_latency
 
  ### 1.    Prepare CM Server
 
-     - [ ] Start CM Server
+   - [ ] Start CM Server
 
-     ```
+   ```
      service cloudera-scm-server start
 
     tail -f /var/log/cloudera-scm-server/cloudera-scm-server.log
     ```
 
-     - [ ] Start CM Agents
+   - [ ] Start CM Agents
 
-     ```
-      service cloudera-scm-agent start
+  ```
+    service cloudera-scm-agent start
+    tail -f /var/log/cloudera-scm-agent/cloudera-scm-agent.log
+  ```
 
-     tail -f /var/log/cloudera-scm-agent/cloudera-scm-agent.log
-    ```
-
-     - [ ] Login to CM Web UI  (Use Chrome)
+   - [ ] Login to CM Web UI  (Use Chrome)
 
 ```
     http://lbdp15abu.uat.example.com:7180
@@ -161,11 +169,11 @@ echo "1" > /proc/sys/net/ipv4/tcp_low_latency
 
     Accept the license
 ```
-     - [ ]  Install CM Agent on all remaining hosts (Note: it may already be installed)
+   - [ ]  Install CM Agent on all remaining hosts (Note: it may already be installed)
 
-    `pssh sudo yum install cloudera-manager-agent cloudera-manager-daemons`
+   `pssh sudo yum install cloudera-manager-agent cloudera-manager-daemons`
 
-     - [ ] Edit the scm agent configuration to point to CM server
+   - [ ] Edit the scm agent configuration to point to CM server
 
     `pssh sed -i '3s/.*/server_host= cmhostexample.com/' /etc/cloudera-scm-agent/config.ini`
 
@@ -174,48 +182,23 @@ echo "1" > /proc/sys/net/ipv4/tcp_low_latency
     `for h in `cat ~pl38360/hosts.txt`; do echo $h; ssh $h sed -i \'3s/.*/server_host= cmhostexample.com/\' /etc/cloudera-scm-agent/config.ini ; done`
 
 
-     - [ ] Restart CM Agent
+  - [ ] Restart CM Agent
 ```
     service cloudera-scm-agent restart
-
     tail -f /var/log/cloudera-scm-agent/cloudera-scm-agent.log
 ```
 
-     - [ ] CM, go 'Back' to have all the nodes show up in the list of nodes to add
+  - [ ] CM, go 'Back' to have all the nodes show up in the list of nodes to add
 
- >     Click 'Currently Managed Hosts' tab
- >
- >     Ensure all expected nodes are included in the list.
- >
- >     Select (place checkmark) on all nodes. Click 'Continue'
- >
- >     On the next screen, click 'More Options'
- >
- >      - [ ] Add internal CDH parcel repository if needed
+      Click 'Currently Managed Hosts' tab
+      Ensure all expected nodes are included in the list.
+      Select (place checkmark) on all nodes. Click 'Continue'
+      On the next screen, click 'More Options'
+ 
+   - [ ] Add internal CDH parcel repository if needed
 
-     - [ ]    Resolve host inspector issues
- >
- >     If THP shows up:
- >
- >     cat /sys/kernel/mm/transparent_hugepage/defrag always madvise [never]   It should indicate [never] which means it's disabled
- >
- >     vi /etc/rc.local You should see these lines: # Begin Hadoop Configuration parameters echo never > /sys/kernel/mm/transparent_hugepage/defrag
- >     TODO: Need to edit scripts with RHEL7 version
- >
- >     echo never >  /sys/kernel/mm/transparent_hugepage/defrag
- >
- >     # End Hadoop Configuration parameters
- >
- >     Update VM Swappiness
- >
- >     echo "vm.swappiness = 1" >> /etc/sysctl.conf
- >     echo 1 > /proc/sys/vm/swappiness
- >
- >     NOTE: Consider running a DNS caching server (or more than one) inside the cluster for performance reasons.
- >
- >     check for multiple host groups. look for differences and resolve if needed.
- >
- >     Check errors then correct then run host inspector again
+   - [ ]    Resolve host inspector issues
+
 
 ###    4.    Assign services to hosts
 
