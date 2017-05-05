@@ -202,12 +202,12 @@ echo "1" > /proc/sys/net/ipv4/tcp_low_latency
 
 ###    4.    Assign services to hosts
 
-     - [ ] hdfs blocksize = 128
-     - [ ] failed volumes: half # disks
-     - [ ] Set ZooKeeper root for Kafka to /kafka
-     - [ ] Also checked Enable Kafka Monitoring (Note: Requires Kafka-1.3.0 parcel or higher)
-     - [ ] get hardware specs and fill out the Yarn Tuning guide.
-     - [ ] modify memory overcommit validation threshold if needed
+  - [ ] hdfs blocksize = 128
+  - [ ] failed volumes: half # disks
+  - [ ] Set ZooKeeper root for Kafka to /kafka
+  - [ ] Also checked Enable Kafka Monitoring (Note: Requires Kafka-1.3.0 parcel or higher)
+  - [ ] get hardware specs and fill out the Yarn Tuning guide.
+  - [ ] modify memory overcommit validation threshold if needed
 
 
 ##    Benchmark/Smoketest
@@ -244,10 +244,10 @@ echo "1" > /proc/sys/net/ipv4/tcp_low_latency
     hadoop jar /opt/cloudera/parcels/CDH/jars/hadoop-examples.jar terasort /user/pl75230/teragen1TB /user/pl75230/terasort1TB
     ```
 
-     - [ ] get job screen shots for doc
-     - [ ] Resource Pool Usage
-     - [ ] Cluster CPU/IO/Network
-     - [ ] get CM graphs screen shots for doc
+  - [ ] get job screen shots for doc
+  - [ ] Resource Pool Usage
+  - [ ] Cluster CPU/IO/Network
+  - [ ] get CM graphs screen shots for doc
 
     Should see less network more I/O
 
@@ -255,7 +255,7 @@ echo "1" > /proc/sys/net/ipv4/tcp_low_latency
     ```
     hadoop jar /opt/cloudera/parcels/CDH/jars/hadoop-examples.jar teravalidate /user/pl75230/terasort1TB /user/pl75230/teravalidate1TB
     ```
-     - [ ] get job screen shots for doc
-     - [ ] Resource Pool Usage
-     - [ ] Cluster CPU/IO/Network
-     - [ ] get CM graphs screen shots for doc
+  - [ ] get job screen shots for doc
+  - [ ] Resource Pool Usage
+  - [ ] Cluster CPU/IO/Network
+  - [ ] get CM graphs screen shots for doc
