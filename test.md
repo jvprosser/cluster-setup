@@ -198,7 +198,7 @@ On the CM host
 Verify if you want:
 `/usr/java/latest/bin/keytool -list -v -keystore jssecacerts | less`
 
-[ ] Then restart the Cloudera manager server
+ - [ ] Then restart the Cloudera manager server
 
 If you see this error:
 PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target. 
@@ -248,7 +248,7 @@ The ROOT and intermediate certificates that signed the LDAPs server’s certific
 
 So if you had to modify jssecacerts for ldap, you’ll need to modify /opt/cloudera/security/truststore/ca-truststore.pem as well.
 
-[ ] This new version of the truststore will need to be copied to all the nodes in the cluster since every impalad will need to talk to the LDAP server at some point.
+ - [ ] This new version of the truststore will need to be copied to all the nodes in the cluster since every impalad will need to talk to the LDAP server at some point.
 
 Property	|Value
 | --- | --- | 
@@ -403,17 +403,17 @@ Sentry Admin group +=|LDAP_admingroup
 
 Add Sentry Service dependencies for:
 
- [ ] Hive
- [ ] Impala
- [ ] Solr
- [ ] Hue
- [ ] Kafka
+  - [ ] Hive
+  - [ ] Impala
+  - [ ] Solr
+  - [ ] Hue
+  - [ ] Kafka
 
- [ ] On HiveServer2 make sure Impersonation is disabled.
+ -  [ ] On HiveServer2 make sure Impersonation is disabled.
  
- [ ] Log into beeline and set up the DBA role for the sentry admin group
+  - [ ] Log into beeline and set up the DBA role for the sentry admin group
  
-[ ] create role platform_admin;
+ - [ ] create role platform_admin;
 
 `grant all on server server1 to platform_admin; grant role platform_admin to group LDAP_admingroup;`
 
@@ -424,35 +424,35 @@ HDFS transparent disk encryption should be configured using the Cloudera Manager
 ### 1. Wizard
 
 Prior to running the wizard, 
-[ ] Make sure the jssecacerts file from /user/java/latest/jre/lib/security/jssecacerts is copied to the same location on both KMS Proxy hosts.
+ - [ ] Make sure the jssecacerts file from /user/java/latest/jre/lib/security/jssecacerts is copied to the same location on both KMS Proxy hosts.
 
-[ ] Determine the name of the ORG  ___________ (typically part of the REALM)
+ - [ ] Determine the name of the ORG  ___________ (typically part of the REALM)
 
-[ ] Make sure the nodes that will be the key trustee server are NOT part of the CDH cluster.  They will be added into their own cluster.
+ - [ ] Make sure the nodes that will be the key trustee server are NOT part of the CDH cluster.  They will be added into their own cluster.
 
-[ ] Make sure the KEYTRUSTEE SERVER parcel has not been distributed on the CDH cluster. Remove it if has.  Otherwise the wizard will be confused and won’t ask you to create a dedicated cluster for the key trustees.
+ - [ ] Make sure the KEYTRUSTEE SERVER parcel has not been distributed on the CDH cluster. Remove it if has.  Otherwise the wizard will be confused and won’t ask you to create a dedicated cluster for the key trustees.
 
-[ ] Make sure the CDH parcel has not been distributed to a KeyTrustee cluster if you have made one already.
+ - [ ] Make sure the CDH parcel has not been distributed to a KeyTrustee cluster if you have made one already.
 
-[ ] Identify the hosts that will perform the KMS roles
+ - [ ] Identify the hosts that will perform the KMS roles
 ```
     
     
 ```
 
-[ ] Make sure that the hosts that will run the key trustee role instances have the key trustee server parcel downloaded/distributed and activated.
+ - [ ] Make sure that the hosts that will run the key trustee role instances have the key trustee server parcel downloaded/distributed and activated.
 
 To do this, 
 ```copy KEYTRUSTEE_SERVER-5.10.0-1.keytrustee5.10.0.p0.26-el7.parcel and KEYTRUSTEE_SERVER-5.10.0-1.keytrustee5.10.0.p0.26-el7.parcel.sha to the CM host:/opt/cloudera/parcel-repo and then in CM parcels page click the “check for new parcels” button.
 ```
 
-[ ] Determine if you can ssh without a password from one KMS to the other.
+ - [ ] Determine if you can ssh without a password from one KMS to the other.
 
-[ ] Before the rsync step you may need to scp the CM host’s id_rsa* to root@keytrustee2:.ssh/
+ - [ ] Before the rsync step you may need to scp the CM host’s id_rsa* to root@keytrustee2:.ssh/
 
-[ ] Identify the AD group that will have the privs to create keys. (referred to as LDAP_admingroup below)
+ - [ ] Identify the AD group that will have the privs to create keys. (referred to as LDAP_admingroup below)
  
-[ ] Check both hosts for entropy
+ - [ ] Check both hosts for entropy
 ```
 ssh root@kmshost 'cat /proc/sys/kernel/random/entropy_avail'
 ```
@@ -460,9 +460,9 @@ What is the entropy for each one:
 ```
 
 ```
-[ ] if it's < 500, install the rng package, etc.
+ - [ ] if it's < 500, install the rng package, etc.
 
-[ ] run init on one of the KMSs
+ - [ ] run init on one of the KMSs
 ```
 root@kmshost1 ~]# ktadmin init
 INFO:keytrustee.server.util:Creating self-signed cert
@@ -470,12 +470,12 @@ INFO:keytrustee.util:`/usr/bin/openssl req -nodes -new -days 3650 -subj /C=US/ST
 Initialized directory for 4096R/B9C9EDC386B9EC90007CDB115E25C433DF33E13C
 ```
 
-[ ] copy the signature to the other KMS so they appear to the KTS as the same host
+ - [ ] copy the signature to the other KMS so they appear to the KTS as the same host
 ```
 rsync -avP /var/lib/kms-keytrustee/keytrustee/.keytrustee/ root@<kmshost2>:/var/lib/kms-keytrustee/keytrustee/.keytrustee/
 ```
  
-[ ] Confirm the sigs are the same
+ - [ ] Confirm the sigs are the same
 ```
 ssh kmshost1 'gpg --fingerprint --homedir /var/lib/kms-keytrustee/keytrustee/.keytrustee'
 ssh kmshost2 'gpg --fingerprint --homedir /var/lib/kms-keytrustee/keytrustee/.keytrustee'
@@ -601,14 +601,14 @@ The following KMS ACLs were pasted into the configuration input text box in the 
 Make sure KMS Service has “Key Trustee KMS” selected
 Make sure the KMS jks files have the root and intermediate certs imported
 ### 6.4	Encryption Zones
-[ ] Create the encryption zone keys
+ - [ ] Create the encryption zone keys
 ```
 hadoop key create datakey
 hadoop key create hbase
 hadoop key create solr
 ```
 
-[ ] Create the encryption zones for new data
+ - [ ] Create the encryption zones for new data
 ```
 hdfs crypto -createZone -path /data -keyName datakey 
 hdfs crypto -createZone -path /keystore -keyName keystore_key
@@ -616,7 +616,7 @@ hdfs crypto -createZone -path /keystore -keyName keystore_key
 
 Because HBase and Solr were already initialized, those services will have to be stopped and because there was no data in the existing directories, the existing /hbase and /solr directories were renamed to be /hbase_orig and /solr_orig .  /hbase and /solr were then created and the encryption zones were created. Then the contents of the orig directories were copied over and then the orig directories were removed.
 
-[ ] create the encryption zones for existing data
+ - [ ] create the encryption zones for existing data
 ```
 hdfs crypto -createZone -path /hbase -keyName hbase_key
 hdfs crypto -createZone -path /solr -keyName solr_key
@@ -667,4 +667,5 @@ The process to correct this involved the following steps:
 Message: [24/Apr/2017 07:05:31 -0700] WARNING  Caught LDAPError while authenticating jprosser: SERVER_DOWN({'info': "TLS error -8179:Peer's Certificate issuer is not recognized.", 'desc': "Can't contact LDAP server"},)
 
 
+ 
  
