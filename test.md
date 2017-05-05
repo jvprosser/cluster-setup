@@ -4,6 +4,8 @@
 
   ### 1. 	Preparation
  - [ ] Confirm the installation of or Download and install the Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files from the Oracle website into /usr/java/latest/jre/lib/security
+ 
+  - [ ] Determine how the certs will be signed. _____________
 
 Private and public key pairs and CSRs for all hosts can be generated using the Cloudera Professional Services Certificate ToolKit.   Download and install this toolkit.  For this example, the toolkit directory will be named CertToolkit-master.
 
@@ -11,9 +13,17 @@ Once you locate that directory on the Cloudera Manager host, change directory to
 
 Within that directory is a file called defaults.yaml.
 
-This file should be reviewed and modified as needed for your environment, but you should make sure that he JAVA and CM information is correct, and also make sure TLS_LEVEL=3
+This file should be reviewed and modified as needed for your environment, 
 
- ### 2. 	Subject Alternative Name
+ - [ ] Make sure that he JAVA and CM information is correct, and also make sure TLS_LEVEL=3
+
+ - [ ] Validate cluster node connectivity with `python certtoolkit.py precheck`
+
+Resolve all issues that arise.
+
+ ### 3. 	Adding initial certs
+
+ #### 	Subject Alternative Names
  - [ ]  Find out if there is a load balancer in front of the cluster and whether its doing pass-through.  The certificates need to know about the VIP front-end’s hostname's Subject Alternate Name section.
   
 Subject Alternative Name extensions should be set on any of the CSRs that will be behind the VIP.
@@ -41,7 +51,11 @@ edgeNode2 DNS:hueVIP-prod.example-internal.net,DNS:hbaseVIP-prod.example-interna
 dataNode1 DNS:impalaVIP-prod.example-internal.net,DNS:solrVIP-prod.example-internal.net,DNS:impalaVIP,DNS:solrVIP,DNS:impalaVIP.example-internal.net,DNS:solrVIP.example-internal.net
 ```
 
- ### 3. 	Adding initial certs
+
+ - [ ] Generate the CSRs with `python certtoolkit.py prepare`
+
+Zip the CSRs and 
+
 After receiving the certs, rename them to .pem if needed and install them in the /opt/cloudera/security/setup/certs directory where the CSR files are.  The CSR files must be there or the CertToolkit will fail.
 Install the Intermediate cert and Root CA in the /opt/cloudera/security/setup/ca-cert directory and make sure they have the .pem extension.
 Make sure you have the complete chain. You can do this via:
