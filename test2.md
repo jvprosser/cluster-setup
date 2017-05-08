@@ -90,7 +90,8 @@ echo "1" > /proc/sys/net/ipv4/tcp_low_latency
    UAT Cloudera Installation
    - [ ]  Install  JDBC driver on CM server
    - [ ]  Check jdbc driver exists on all nodes that have services that connects to Oracle
-
+   - [ ] wget --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u60-b27/\
+jdk-8u60-linux-x64.rpm" -O jdk-8-linux-x64.rpm
     If nodes do not have it  we need to install by copying from one of the nodes
 
     then move the file from /tmp to /usr/share/java on that node
