@@ -25,6 +25,9 @@ rm -f /data$i/test
 done
 ```
 
+### 2. NTP
+clush -a -b 'ntpq -p'
+
 
 ### 2.    Kernel settings
 
