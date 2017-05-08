@@ -1,15 +1,15 @@
 ## Hardware validation
 
- - [ ] Get Certtoolkit
- - [ ] Get pssh
+ - [ ] Get Certtoolkit http://github.mtv.cloudera.com/CertTeam/CertToolkit/
+ - [ ] Get clustershell http://clustershell.readthedocs.io/en/latest/index.html
  - [ ] Identify RDBMS and get drivers.
-
+ - [ ] Set up passwordless root login from CM host to all hosts.
 
 ### 1.    Validate Disks
 
- - [ ] pssh 'df –h'
- - [ ] pssh "dmesg | egrep -i 'sense error|ata bus error'"
- - [ ] pssh check_disks.sh
+ - [ ] clush -a -b 'df –h'
+ - [ ] clush -a -b "dmesg | egrep -i 'sense error|ata bus error'"
+ - [ ] clush -a -b check_disks.sh
 
 ```
 #!/bin/bash
@@ -26,15 +26,13 @@ done
 ```
 
 
-
 ### 2.    Kernel settings
 
-
- - [ ] pssh cat /etc/sysctl.conf | ess
+ - [ ] clush -a -b 'cat /etc/sysctl.conf' | less
  - [ ] Check and fix swappiness
 
 ```
-pssh "sed -i 's/vm.swappiness = 0/vm.swappiness = 1/g' /etc/sysctl.conf"
+clush -a -b "sed -i 's/vm.swappiness = 0/vm.swappiness = 1/g' /etc/sysctl.conf"
 echo 1 > /proc/sys/vm/swappiness
 ```
 #### check rc.local
@@ -64,7 +62,6 @@ echo 1 > /proc/sys/vm/swappiness
 # the TCP stack makes decisions that prefer lower latency as opposed to higher throughput.
 echo "1" > /proc/sys/net/ipv4/tcp_low_latency
 ```
-
 
 ### 3.    Validate network
 
@@ -171,11 +168,11 @@ echo "1" > /proc/sys/net/ipv4/tcp_low_latency
 ```
  - [ ]  Install CM Agent on all remaining hosts (Note: it may already be installed)
 
-   `pssh sudo yum install cloudera-manager-agent cloudera-manager-daemons`
+   `clush -a -b  yum install cloudera-manager-agent cloudera-manager-daemons`
 
  - [ ] Edit the scm agent configuration to point to CM server
 
-    `pssh sed -i '3s/.*/server_host= cmhostexample.com/' /etc/cloudera-scm-agent/config.ini`
+    `clush -a -b sed -i '3s/.*/server_host= cmhostexample.com/' /etc/cloudera-scm-agent/config.ini`
 
     or
 
