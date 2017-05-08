@@ -6,6 +6,7 @@
  - [ ] Confirm the installation of or Download and install the Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files from the Oracle website into /usr/java/latest/jre/lib/security
  
   - [ ] Determine how the certs will be signed. _____________
+  - [ ] Determine AD/Linux persistence SSSD, VAS, Ac
 
 Private and public key pairs and CSRs for all hosts can be generated using the Cloudera Professional Services Certificate ToolKit.   Download and install this toolkit.  For this example, the toolkit directory will be named CertToolkit-master.
 
