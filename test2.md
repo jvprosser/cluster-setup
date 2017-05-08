@@ -2,6 +2,10 @@
 
  - [ ] Get Certtoolkit http://github.mtv.cloudera.com/CertTeam/CertToolkit/
  - [ ] Get clustershell http://clustershell.readthedocs.io/en/latest/index.html
+
+ - [ ] yum -y install python-pip 
+ - [ ] pip install beautifulsoup4 cm_api paramiko pyyaml requests_ntlm
+
  - [ ] Identify RDBMS and get drivers.
  - [ ] Set up passwordless root login from CM host to all hosts.
 
