@@ -693,5 +693,21 @@ The process to correct this involved the following steps:
 Message: [24/Apr/2017 07:05:31 -0700] WARNING  Caught LDAPError while authenticating jprosser: SERVER_DOWN({'info': "TLS error -8179:Peer's Certificate issuer is not recognized.", 'desc': "Can't contact LDAP server"},)
 
 
+ ###2. SSSD
+ Look for the field guide to sssd config:
  
+ Pre-requisites:
+●	Ensure FQDN (forward and reverse), DNS, NTP and network is solid
+●	OS packages: krb5-workstation, krb5-libs, krb5-auth-dialog, 
+○	sssd, sssd-ad, samba-client - (should work on EL6 and EL7)
+○	sssd and realmd (on EL7)
+●	Install SSSD on every host
+●	IF EL6, Install Samba
+●	If EL7, use Realm and SSSD - see appendix for RHEL7 document for instructions
+●	Ports? Everything needed for the AD - 88, 389, 3268, 636, 3269
+●	Disable NSCD from caching AD lookups
+●	(Postrequisite) Disable CM from managing krb5.conf (this is always a good practice)
+●	All groups that we are using should be created in the new OU
+
+
  
