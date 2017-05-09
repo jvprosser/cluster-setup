@@ -105,6 +105,10 @@ jdk-8u60-linux-x64.rpm" -O jdk-8-linux-x64.rpm
 
 #### Setup repository
  - [ ]  Check repo to make sure it points to the correct internal site:
+ - [ ]  Download the Spark2 CSD, chmod 644, chown cloudera-scm: , mv to /opt/cloudera/csd
+ 
+ 
+ ### http://ip:7180/cmf/express-wizard/wizard
 
 ```
     $ cat /etc/yum.repos.d/Cloudera_Manager.repo
