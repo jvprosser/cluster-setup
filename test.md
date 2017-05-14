@@ -6,6 +6,7 @@
   - [ ] Confirm the installation of or Download and install the Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files from the Oracle website into /usr/java/latest/jre/lib/security
 
   - [ ] yum -y install python-pip 
+ [root@clouderaadmin01 Cloudera]# subscription-manager repos --enable rhel-7-server-optional-rpms
   - [ ] pip install beautifulsoup4 cm_api paramiko pyyaml requests_ntlm
 
   - [ ] Determine how the certs will be signed. _____________
