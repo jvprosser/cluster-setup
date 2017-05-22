@@ -29,6 +29,8 @@ rm -f /data$i/test
 done
 ```
 
+ - [ ] Confirm /etc/fstab has defaults,noatime
+
 ### 2. NTP
 clush -a -b 'ntpq -p'
 
