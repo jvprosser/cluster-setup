@@ -44,6 +44,10 @@ clush -a -b 'ntpq -p'
 clush -a -b "sed -i 's/vm.swappiness = 0/vm.swappiness = 1/g' /etc/sysctl.conf"
 echo 1 > /proc/sys/vm/swappiness
 ```
+ - [ ] Check and fix the amount of swap available
+ ```
+ free -h
+ ```
 #### check rc.local
 - [ ]  check THP 
 
