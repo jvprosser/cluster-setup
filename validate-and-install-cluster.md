@@ -223,7 +223,10 @@ jdk-8u60-linux-x64.rpm" -O jdk-8-linux-x64.rpm
  - [ ] Also checked Enable Kafka Monitoring (Note: Requires Kafka-1.3.0 parcel or higher)
  - [ ] get hardware specs and fill out the Yarn Tuning guide.
  - [ ] modify memory overcommit validation threshold if needed
-
+ - [ ] ZooKeeper dataDir and dataLogDir need to be on their own dedicated disks (each)
+ - [ ] Check YARN's logging directories.  There should be one for every disk used for HDFS storage
+ - [ ] Check that Impala has  scratch directories configured, otherwise all spills go to /tmp.  This is bad for performance, and risks filling up /tmp quickly.
+ - [ ] Check that yarn log aggregation is enabled.
 
 ##    Benchmark/Smoketest
 
