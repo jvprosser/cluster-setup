@@ -212,8 +212,21 @@ jdk-8u60-linux-x64.rpm" -O jdk-8-linux-x64.rpm
  
  - [ ] Add internal CDH parcel repository if needed
 
- - [ ]    Resolve host inspector issues
+ - [ ] Resolve host inspector issues
 
+### 1.    Check entropy
+You can check the available entropy on a Linux system by running the following command:
+
+- [ ] cat /proc/sys/kernel/random/entropy_avail
+
+The output displays the entropy currently available. Check the entropy several times to determine the state of the entropy pool on the system. If the entropy is consistently low (500 or less), you must increase it by installing rng-tools and starting the rngd service.
+
+```
+sudo yum install rng-tools
+cp /usr/lib/systemd/system/rngd.service /etc/systemd/system/
+sed -i -e 's/ExecStart=\/sbin\/rngd -f/ExecStart=\/sbin\/rngd -f -r\/dev\/urandom/' /etc/systemd/system/rngd.service
+systemctl daemon-reload$ systemctl start rngd$ systemctl enable rngd
+```
 
 ###    4.    Assign services to hosts
 
