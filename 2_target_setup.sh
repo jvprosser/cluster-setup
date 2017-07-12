@@ -88,6 +88,8 @@ cp /etc/rc.local /etc/sysconfig/_rc.local.orig.`date +%d%m%y%H%M%S`
 echo "vm.swappiness = 1" >> /etc/sysctl.conf
 
 #other sysctl settings from csco @ PNC 
+
+# add these to /etc/sysctl.conf
 # Disable response to broadcasts.
 net.ipv4.icmp_echo_ignore_broadcasts = 1
 # enable route verification on all interfaces
