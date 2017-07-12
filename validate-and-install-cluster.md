@@ -2,7 +2,9 @@
 
  - [ ] Get Certtoolkit http://github.mtv.cloudera.com/CertTeam/CertToolkit/
  - [ ] Get clustershell http://clustershell.readthedocs.io/en/latest/index.html
-
+ or
+ - [ ] Get pssh 
+ - [ ] yum install epel-release (if needed)
  - [ ] yum -y install python-pip 
  - [ ] pip install beautifulsoup4 cm_api paramiko pyyaml requests_ntlm
 
