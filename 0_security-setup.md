@@ -1,11 +1,12 @@
 # security-setup
 ## 0. Sysadmin prep
-# or https://pypi.python.org/pypi/pssh/2.3.1
-`alias jpssh="~/pssh-2.3.1/bin/pssh --timeout=0 --inline-stdout -h ~/hostlist.txt -x '-tt' -X '-oStrictHostKeyChecking=no'"`
-`alias jpscp="~/pssh-2.3.1/bin/pscp -h ~/hostlist.txt -X '-oStrictHostKeyChecking=no'"`
+### pssh
+  - [ ]  https://pypi.python.org/pypi/pssh/2.3.1
+  `alias jpssh="~/pssh-2.3.1/bin/pssh --timeout=0 --inline-stdout -h ~/hostlist.txt -x '-tt' -X '-oStrictHostKeyChecking=no'"`
+  `alias jpscp="~/pssh-2.3.1/bin/pscp -h ~/hostlist.txt -X '-oStrictHostKeyChecking=no'"`
 
-`jpsssh "adduser spotuser;echo cloudera|passwd spotuser --stdin"`
-`jprosser "usermod -aG wheel spotuser"`
+  - [ ] `jpsssh "adduser spotuser;echo cloudera|passwd spotuser --stdin"`
+  - [ ] `jprosser "usermod -aG wheel spotuser"`
 
 ### Password less login between nodes
 `ssh-keygen -t rsa
@@ -21,46 +22,37 @@ ssh-copy-id spot-demo-4`
 ### To enable timestamps for dmesg (kernel version >= 2.6.11):
 `echo Y > /sys/module/printk/parameters/time`
 
-Add this to /etc/rc.local:
+  - [ ] Add this to /etc/rc.local:
 `if test -f /sys/module/printk/parameters/time; then
 echo 1 > /sys/module/printk/parameters/time
 fi`
 
-and/or use this kernel boot parameter:
+  - [ ]  and/or use this kernel boot parameter:
 `printk.time=1`
 
 We often look at dmesg output, but without timestamps you can't be sure if the logged error was before or after any changes you made. If the above fails, you can insert a log line with a timestamp like this:
 echo "`date` kernel changes in effect" > /dev/kmsg
 
-## Handy strace One-Liners
-### Slow the target command and print details for each syscall:
+### Handy strace One-Liners
+  - [ ]  Slow the target command and print details for each syscall:
 `strace command`
-
-### Slow the target PID and print details for each syscall:
+  - [ ]  Slow the target PID and print details for each syscall:
 `strace -p PID`
-
-### Slow the target PID and any newly created child process, printing syscall details:
+  - [ ]  Slow the target PID and any newly created child process, printing syscall details:
 `strace -fp PID`
-
-### Slow the target PID and record syscalls, printing a summary:
+  - [ ]  Slow the target PID and record syscalls, printing a summary:
 `strace -cp PID`
-
-### Slow the target PID and trace open() syscalls only:
+  - [ ]  Slow the target PID and trace open() syscalls only:
 `strace -eopen -p PID`
-
-### Slow the target PID and trace open() and stat() syscalls only:
+  - [ ]  Slow the target PID and trace open() and stat() syscalls only:
 `strace -eopen,stat -p PID`
-
-### Slow the target PID and trace connect() and accept() syscalls only:
+  - [ ]  Slow the target PID and trace connect() and accept() syscalls only:
 `strace -econnect,accept -p PID`
-
-### Slow the target command and see what other programs it launches (slow them too!):
+  - [ ]  Slow the target command and see what other programs it launches (slow them too!):
 `strace -qfeexecve command`
-
-### Slow the target PID and print time-since-epoch with (distorted) microsecond resolution:
+  - [ ]  Slow the target PID and print time-since-epoch with (distorted) microsecond resolution:
 `strace -ttt -p PID`
-
-### Slow the target PID and print syscall durations with (distorted) microsecond resolution:
+  - [ ]  Slow the target PID and print syscall durations with (distorted) microsecond resolution:
 `strace -T -p PID`
 
 
