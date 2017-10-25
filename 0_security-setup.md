@@ -14,7 +14,7 @@
 ```ssh-keygen -t rsa
 ssh-copy-id spot-demo-2
 ssh-copy-id spot-demo-3
-ssh-copy-id spot-demo-4```
+ssh-copy-id spot-demo-4'''
 
 ### clear caches
 
