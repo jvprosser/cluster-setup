@@ -242,6 +242,8 @@ systemctl daemon-reload$ systemctl start rngd$ systemctl enable rngd
  - [ ] ZooKeeper dataDir and dataLogDir need to be on their own dedicated disks (each)
  - [ ] Check YARN's logging directories.  There should be one for every disk used for HDFS storage
  - [ ] Check that Impala has  scratch directories configured, otherwise all spills go to /tmp.  This is bad for performance, and risks filling up /tmp quickly.
+ - [ ] Impala > Configurations > Service-Wide > Advanced > Impala Command Line Argument Advanced Configuration Snippet (Safety Valve)  set --idle_session_timeout =180
+
  - [ ] Check that yarn log aggregation is enabled.
 
 ##    Benchmark/Smoketest
