@@ -93,6 +93,66 @@ echo "1" > /proc/sys/net/ipv4/tcp_low_latency
  - [ ]  ethtool eth0 | grep Speed
  - [ ]  ethtool –S eth0 | grep collision
  - [ ]  ethtool –S eth0 | grep drop
+ 
+ Configure CPUs for Performance Scaling
+
+CPU Scaling is configurable and defaults commonly to favor power saving over performance. For Hadoop clusters, it is important that we configure then for better performance over other options.
+
+Please set scaling governors to performance, which means running the CPU at maximum frequency.  To do so run `cpufreq-set -r -g performance` OR edit /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor and set the content to 'performance'
+
+
+# add these to /etc/sysctl.conf
+# Disable response to broadcasts.
+net.ipv4.icmp_echo_ignore_broadcasts = 1
+# enable route verification on all interfaces
+net.ipv4.conf.all.rp_filter = 1
+# enable ipV6 forwarding
+#net.ipv6.conf.all.forwarding = 1
+# increase the number of possible inotify(7) watches
+fs.inotify.max_user_watches = 65536
+# avoid deleting secondary IPs on deleting the primary IP
+net.ipv4.conf.default.promote_secondaries = 1
+net.ipv4.conf.all.promote_secondaries = 1
+# Hadoop
+# arp_filter - With arp_filter set to 1, the kernel only answers to an ARP request if it matches its own IP address.
+net.ipv4.conf.all.arp_filter = 1
+
+# the percentage of system memory that can be filled with “dirty” pages — memory pages that still need to be written to disk
+# before the pdflush/flush/kdmflush background processes kick in to write it to disk. below setting is 1%
+vm.dirty_background_ratio = 1
+
+#Heuristic overcommit handling. Obvious overcommits of address space are refused. Used for a typical system. It
+# ensures a seriously wild allocation fails while allowing overcommit to reduce swap usage.  root is allowed to 
+# allocate slightly more memory in this mode. This is the default.
+#vm.overcommit_memory = 0
+
+# This sets the max OS receive buffer size for all types of connections.
+net.core.rmem_max = 16777216
+
+# This sets the max OS send buffer size for all types of connections.
+net.core.wmem_max = 16777216
+
+# TCP Autotuning setting. "The first value tells the kernel the minimum receive buffer for each TCP connection, 
+# and this buffer is always allocated to a TCP socket, even under high pressure on the system. ... The second value 
+# specified tells the kernel the default receive buffer allocated for each TCP socket. This value overrides the 
+# /proc/sys/net/core/rmem_default value used by other protocols. ... The third and last value specified in this 
+# variable specifies the maximum receive buffer that can be allocated for a TCP socket." 
+net.ipv4.tcp_rmem = 4096 87380 16777216
+
+# TCP Autotuning setting. "This variable takes 3 different values which holds information on how much TCP sendbuffer memory 
+# space each TCP socket has to use. Every TCP socket has this much buffer space to use before the buffer is filled up. Each of 
+# the three values are used under different conditions. ... The first value in this variable tells the minimum TCP send buffer 
+# space available for a single TCP socket. ... The second value in the variable tells us the default buffer space allowed for 
+# a single TCP socket to use. ... The third value tells the kernel the maximum TCP send buffer space." a 
+net.ipv4.tcp_wmem = 4096 65536 16777216
+
+
+# man 7 tcp
+# This parameter controls TCP Packetization-Layer Path MTU Discovery. The following values may be assigned to the file:
+# 0 Disabled
+# 1 Disabled by default, enabled when an ICMP black hole detected
+# 2 Always enabled, use initial MSS of tcp_base_mss.
+net.ipv4.tcp_mtu_probing=1
 
  >     NOTE: Consider running a DNS caching server (or more than one) inside the cluster for performance reasons.
  >     check for multiple host groups. look for differences and resolve if needed.
