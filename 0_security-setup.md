@@ -2,9 +2,9 @@
 ## 0. Sysadmin prep
 ### pssh
   - [ ]  https://pypi.python.org/pypi/pssh/2.3.1
-  
-  `alias jpssh="~/pssh-2.3.1/bin/pssh --timeout=0 --inline-stdout -h ~/hostlist.txt -x '-tt' -X '-oStrictHostKeyChecking=no'"`
- 
+
+  `alias jpssh="~/pssh-2.3.1/bin/pssh --timeout=0 --inline-stdout -h ~/hostlist.txt -x '-tt' -X '-oStrictHostKeyChecking=no'"`
+
  `alias jpscp="~/pssh-2.3.1/bin/pscp -h ~/hostlist.txt -X '-oStrictHostKeyChecking=no'"`
 
   - [ ] `jpsssh "adduser spotuser;echo cloudera|passwd spotuser --stdin"`
@@ -30,7 +30,7 @@ echo 1 > /sys/module/printk/parameters/time
 fi```
 
   - [ ]  and/or use this kernel boot parameter:
-  
+
 `printk.time=1`
 
 We often look at dmesg output, but without timestamps you can't be sure if the logged error was before or after any changes you made. If the above fails, you can insert a log line with a timestamp like this:
@@ -39,43 +39,43 @@ echo "`date` kernel changes in effect" > /dev/kmsg
 
 ### Handy strace One-Liners
   - [ ]  Slow the target command and print details for each syscall:
-  
+
 `strace command`
 
   - [ ]  Slow the target PID and print details for each syscall:
-  
+
 `strace -p PID`
 
   - [ ]  Slow the target PID and any newly created child process, printing syscall details:
-  
+
 `strace -fp PID`
 
   - [ ]  Slow the target PID and record syscalls, printing a summary:
-  
+
 `strace -cp PID`
 
   - [ ]  Slow the target PID and trace open() syscalls only:
-  
+
 `strace -eopen -p PID`
 
   - [ ]  Slow the target PID and trace open() and stat() syscalls only:
-  
+
 `strace -eopen,stat -p PID`
 
   - [ ]  Slow the target PID and trace connect() and accept() syscalls only:
-  
+
 `strace -econnect,accept -p PID`
 
   - [ ]  Slow the target command and see what other programs it launches (slow them too!):
-  
+
 `strace -qfeexecve command`
 
   - [ ]  Slow the target PID and print time-since-epoch with (distorted) microsecond resolution:
-  
+
 `strace -ttt -p PID`
 
   - [ ]  Slow the target PID and print syscall durations with (distorted) microsecond resolution:
-  
+
 `strace -T -p PID`
 
 
@@ -84,7 +84,7 @@ echo "`date` kernel changes in effect" > /dev/kmsg
   ### 1. 	Preparation
   - [ ] Confirm the installation of or Download and install the Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files from the Oracle website into /usr/java/latest/jre/lib/security
 
-  - [ ] yum -y install python-pip 
+  - [ ] yum -y install python-pip
  [root@clouderaadmin01 Cloudera]# subscription-manager repos --enable rhel-7-server-optional-rpms
   - [ ] pip install beautifulsoup4 cm_api paramiko pyyaml requests_ntlm
 
@@ -97,7 +97,7 @@ Once you locate that directory on the Cloudera Manager host, change directory to
 
 Within that directory is a file called defaults.yaml.
 
-This file should be reviewed and modified as needed for your environment, 
+This file should be reviewed and modified as needed for your environment,
 
  - [ ] Make sure that he JAVA and CM information is correct, and also make sure TLS_LEVEL=3
 
@@ -109,7 +109,7 @@ Resolve all issues that arise.
 
  #### 	Subject Alternative Names
  - [ ]  Find out if there is a load balancer in front of the cluster and whether its doing pass-through.  The certificates need to know about the VIP front-end’s hostname's Subject Alternate Name section.
-  
+
 Subject Alternative Name extensions should be set on any of the CSRs that will be behind the VIP.
 
 They are specified using the following configuration entry in the defaults.yaml file:
@@ -138,14 +138,14 @@ dataNode1 DNS:impalaVIP-prod.example-internal.net,DNS:solrVIP-prod.example-inter
 
  - [ ] Generate the CSRs with `python certtoolkit.py prepare`
 
-Zip the CSRs and 
+Zip the CSRs and
 
 After receiving the certs, rename them to .pem if needed and install them in the /opt/cloudera/security/setup/certs directory where the CSR files are.  The CSR files must be there or the CertToolkit will fail.
 Install the Intermediate cert and Root CA in the /opt/cloudera/security/setup/ca-cert directory and make sure they have the .pem extension.
 Make sure you have the complete chain. You can do this via:
 
  `openssl x509 –noout –text –in ROOT-CA-certname.pem`
- 
+
  - [ ] Make sure all the nodes in the cluster are all actively participating and are not decommissioned or otherwise disabled.  If any python errors occurred, the script crashed and did not complete.  Remove any offending nodes from the cluster and re-run the command
 
   ####	Run the script to enable TLS:
@@ -157,7 +157,7 @@ Using this command:
 If you need to add hosts later, make sure the host has the Cloudera manager agent installed and heartbeating to the Cloudera Manager Server host.
  *Put the new hostnames in a file called new_hosts.txt
  *Put the Subject Alternate Names mapping in a file called new_hosts_alt_names.txt and edit defaults.yaml to change the CERT_ALT_NAMES_FILE to match.
- *Rerun the script to generate CSRs: 
+ *Rerun the script to generate CSRs:
  *`python certtoolkit.py --new-hosts=new_hosts.txt prepare `
  *Send the new CSRs to get certs created.
 
@@ -172,52 +172,52 @@ Check out the troubleshooting section at the end for more ideas.
 ## Kerberos
 Kerberos is enabled via the wizard.  Prior to running the wizard, change the following configuration setting in Cloudera Manager under Administration->Settings.  If cross-realm trust (one-way or otherwise) will be needed, get the REALM names and respective kdc hosts for each one.  The fields will look something link this:
 ###  1. Wizard
-Property | Value 
+Property | Value
 | --- | --- |
-Custom Kerberos Keytab Retrieval Script :| /opt/cloudera/security/keytabs/keytab_retrieval.sh 
-Advanced Configuration Snippet (Safety Valve) for the Default Realm in krb5.conf :| kdc = kdchost.example-internal.net 
- Advanced Configuration Snippet (Safety Valve) for remaining krb5.conf | EXAMPLEDEV.COM = { 
-|  | kdc = kdc1.example.com |  
-|  | kdc = kdc2.example.com |  
-|  |  } |  
-|  |  FORESTROOT.COM = { |  
-|  |  kdc = kdc3.forestroot.com |  
-|  |  kdc = kdc4.forestroot.com |  
-|  | } |  
-|  |  EXAMPLEDR.EXAMPLE-INTERNAL.NET = { |  
-|  |  kdc = kdc5.prodr.example-internal.net|  
-|   | } |  
-|   |  |  
-|   | [domain_realm] |  
-|   | .prod.example-internal.net = PROD.EXAMPLE-INTERNAL.NET |  
-|   | .example.com = EXAMPLE.COM |  
-|   | .prodr.example-internal.net = PRODR.EXAMPLE-INTERNAL.NET |  
-|   | .forestroot.com = FORESTROOT.COM |  
-|   | .example-internal.net = PROD.EXAMPLE-INTERNAL.NET |  
-|   | [capaths] |  
-|   | EXAMPLE.COM = { |  
-|   |   PROD.EXAMPLE-INTERNAL.NET = FORESTROOT.COM |  
-|    |  PROD.EXAMPLE-INTERNAL.NET = PRODR.EXAMPLE-INTERNAL.NET |  
-|     | FORESTROOT.COM = . |  
-|   | } |  
-|   | PRODR. EXAMPLE-INTERNAL.COM = { |  
-|   |  PROD.EXAMPLE-INTERNAL.NET = . |  
-|   |   FORESTROOT.COM = . |  
-|    |  EXAMPLE.COM = FORESTROOT.COM |  
-|   | } |  
-|   | FORESTROOT.COM = { |  
-|    |  PRODR. EXAMPLE-INTERNAL.COM = . |  
-|     | EXAMPLE.COM = . |  
-|     | PROD. EXAMPLE-INTERNAL.COM = PRODR. EXAMPLE-INTERNAL.COM |  
-|   | } |  
-|   | PROD.EXAMPLE-INTERNAL.NET = { |  
-|   |   EXAMPLE.COM = PRODR.EXAMPLE-INTERNAL.NET |  
-|    |  EXAMPLE.COM = FORESTROOT.COM |  
-|     | PRODR.EXAMPLE-INTERNAL.NET = . |  
-|  |  } |  
- 
+Custom Kerberos Keytab Retrieval Script :| /opt/cloudera/security/keytabs/keytab_retrieval.sh
+Advanced Configuration Snippet (Safety Valve) for the Default Realm in krb5.conf :| kdc = kdchost.example-internal.net
+ Advanced Configuration Snippet (Safety Valve) for remaining krb5.conf | EXAMPLEDEV.COM = {
+|  | kdc = kdc1.example.com |
+|  | kdc = kdc2.example.com |
+|  |  } |
+|  |  FORESTROOT.COM = { |
+|  |  kdc = kdc3.forestroot.com |
+|  |  kdc = kdc4.forestroot.com |
+|  | } |
+|  |  EXAMPLEDR.EXAMPLE-INTERNAL.NET = { |
+|  |  kdc = kdc5.prodr.example-internal.net|
+|   | } |
+|   |  |
+|   | [domain_realm] |
+|   | .prod.example-internal.net = PROD.EXAMPLE-INTERNAL.NET |
+|   | .example.com = EXAMPLE.COM |
+|   | .prodr.example-internal.net = PRODR.EXAMPLE-INTERNAL.NET |
+|   | .forestroot.com = FORESTROOT.COM |
+|   | .example-internal.net = PROD.EXAMPLE-INTERNAL.NET |
+|   | [capaths] |
+|   | EXAMPLE.COM = { |
+|   |   PROD.EXAMPLE-INTERNAL.NET = FORESTROOT.COM |
+|    |  PROD.EXAMPLE-INTERNAL.NET = PRODR.EXAMPLE-INTERNAL.NET |
+|     | FORESTROOT.COM = . |
+|   | } |
+|   | PRODR. EXAMPLE-INTERNAL.COM = { |
+|   |  PROD.EXAMPLE-INTERNAL.NET = . |
+|   |   FORESTROOT.COM = . |
+|    |  EXAMPLE.COM = FORESTROOT.COM |
+|   | } |
+|   | FORESTROOT.COM = { |
+|    |  PRODR. EXAMPLE-INTERNAL.COM = . |
+|     | EXAMPLE.COM = . |
+|     | PROD. EXAMPLE-INTERNAL.COM = PRODR. EXAMPLE-INTERNAL.COM |
+|   | } |
+|   | PROD.EXAMPLE-INTERNAL.NET = { |
+|   |   EXAMPLE.COM = PRODR.EXAMPLE-INTERNAL.NET |
+|    |  EXAMPLE.COM = FORESTROOT.COM |
+|     | PRODR.EXAMPLE-INTERNAL.NET = . |
+|  |  } |
+
  Even though the custom keytab retrieval script is being used, be sure to follow the pre-requisite to install the openldap-clients package with yum or the wizard will fail.
- 
+
  - [ ] `yum install openldap-clients`
 
  - [ ] Start the wizard
@@ -225,7 +225,7 @@ Advanced Configuration Snippet (Safety Valve) for the Default Realm in krb5.conf
 After completing the wizard, add the following configuration to the HDFS service to map Kerberos principal names to lowercase and strip off the realm. In the case below, some users are coming in from EXAMPLE-INTERNAL.COM but some are also coming in from EXAMPLE.COM so we need to take care of them as well.
 
 Property	|Value
-| --- | --- | 
+| --- | --- |
 Additional Rules to Map Kerberos Principals to Short Names|RULE:[1:$1@$0](.*@\QQA.EXAMPLE-INTERNAL.NET\E$)s/@\QQA.EXAMPLE-INTERNAL.NET\E$//L
 | | RULE:[2:$1@$0](.*@\QQA.EXAMPLE-INTERNAL.NET\E$)s/@\QQA.EXAMPLE-INTERNAL.NET\E$//L
 | | RULE:[1:$1@$0](.*@\QEXAMPLE.COM\E$)s/@\QEXAMPLE.COM\E$//L
@@ -235,7 +235,7 @@ Additional Rules to Map Kerberos Principals to Short Names|RULE:[1:$1@$0](.*@\QQ
 Because Kerberos was not enabled before the CertToolKit was run, several properties need to be changed in the HDFS service after running the Kerberos wizard.
 
 Property	| Value
-| --- | --- | 
+| --- | --- |
 Enable Data Transfer Encryption|  - [ x ]
 Hadoop RPC Protection|Privacy
 DataNode HTTP Web UI Port|Reset to default (50075)
@@ -247,7 +247,7 @@ Enable Kerberos Authentication for HTTP Web-Consoles| - [ x ]
  - [ ]  Determine if the following YARN properties must be configured depending on whether they want to enable spnego on their desktops
 
 Property	| Value
-| --- | --- | 
+| --- | --- |
 Enable Kerberos Authentication for HTTP Web-Consoles|[x] (or not)
 
 ### 3.	Hive
@@ -255,7 +255,7 @@ Enable Kerberos Authentication for HTTP Web-Consoles|[x] (or not)
  - [ ] Set the encryption method for HiveServer2 to use SASL-QOP
 
 Property	| Value
-| --- | --- | 
+| --- | --- |
 HiveServer2 Advanced Configuration Snippet (Safety Valve) for hive-site.xml| ` <property>  <name>hive.server2.thrift.sasl.qop</name>  <value>auth-conf</value></property>`
 
 
@@ -263,7 +263,7 @@ HiveServer2 Advanced Configuration Snippet (Safety Valve) for hive-site.xml| ` <
  ```
  beeline -u "jdbc:hive2://edgenode1.prod.example-internal.com:10000/default;saslQop=auth-conf;principal=hive/_HOST@PROD.EXAMPLE-INTERNAL.COM;ssl=true;sslTrustStore=/opt/cloudera/security/jks/truststore.jks"
  ```
- 
+
 ### 4.	Debugging
 If there is a need to troubleshoot, set these environment variables and try authenticating:
 `export KRB5_TRACE=/tmp/krbtrace.log;`
@@ -273,7 +273,7 @@ If there is a need to troubleshoot, set these environment variables and try auth
 ### 1.	Cloudera Manager
 
 Property	| Value
-| --- | --- | 
+| --- | --- |
 Authentication Backend Order|External then Database
 External Authentication Type|Active Directory
 LDAP URL|ldaps://KDC1.example.com
@@ -287,7 +287,7 @@ Since we are using LDAPS, there is a dependency on the default CA truststore loc
 
 On the CM host
  `cd /usr/java/latest/jre/lib/security`
- 
+
  - [ ] Check it see if there is a file named jssccacerts
 
  - [ ] If it’s not there, copy cacerts to it to create it.
@@ -295,10 +295,10 @@ On the CM host
 
  - [ ] import the CA certs (root and intermediate) to the jssccacerts truststore file.
 
-`keytool -alias intermediate -import -file  /opt/cloudera/security/ca-certs/INTERMEDIATE.pem  -keystore jssccacerts`
+`keytool -alias intermediate -import -file  /opt/cloudera/security/pki/intca.pem  -keystore jssccacerts`
 (The password , is changeit)
 
-`keytool -alias root -import -file  /opt/cloudera/security/ca-certs/Root_CA.pem  -keystore jssccacerts`
+`keytool -alias root -import -file  /opt/cloudera/security/pki/rootca.pem  -keystore jssccacerts`
 (The password , is changeit)
 
 Verify if you want:
@@ -307,16 +307,16 @@ Verify if you want:
  - [ ] Then restart the Cloudera manager server
 
 If you see this error:
-PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target. 
+PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target.
 
- *. Look at jssecacerts in `/usr/java/latest/jre/lib/security/`. The problem is that the root CA cannot be found.  
+ *. Look at jssecacerts in `/usr/java/latest/jre/lib/security/`. The problem is that the root CA cannot be found.
  *. Also try:
 `openssl s_client –showcerts –connect ldaps.example.com:636 `
 Look at the root CAs and make sure they match the ones you’ve been given.
 
 ### 2. Cloudera Navigator
 Property	|Value
-| --- | --- | 
+| --- | --- |
 Authentication Backend Order|External then Cloudera Manager
 External Authentication Type|Active Directory
 LDAP URL|ldaps://KDC1.example.com
@@ -329,7 +329,7 @@ LDAP Groups Search Filter|(&(objectClass=group)(cn=*{0}*))
 
 ### 3.	Hue
 Property	|Value
-| --- | --- | 
+| --- | --- |
 Authentication Backend|desktop.auth.backend.LdapBackend
 LDAP URL|ldaps://KDC1.example.com
 Active Directory Domain|EXAMPLE.COM
@@ -350,24 +350,24 @@ Impala was not written in Java, so it does not use /usr/java/latest/jre/lib/secu
 
 It uses the ca-certs PEM files in /opt/cloudera/security/truststore/ca-truststore.pem
 
-The ROOT and intermediate certificates that signed the LDAPs server’s certificate need to be included in /opt/cloudera/security/truststore/ca-truststore.pem. 
+The ROOT and intermediate certificates that signed the LDAPs server’s certificate need to be included in /opt/cloudera/security/truststore/ca-truststore.pem.
 
 So if you had to modify jssecacerts for ldap, you’ll need to modify /opt/cloudera/security/truststore/ca-truststore.pem as well.
 
  - [ ] This new version of the truststore will need to be copied to all the nodes in the cluster since every impalad will need to talk to the LDAP server at some point.
 
 Property	|Value
-| --- | --- | 
+| --- | --- |
 Enable LDAP Authentication|[x]
 LDAP URL|ldaps://KDC1.example.com
 Active Directory Domain|EXAMPLE.COM
 LDAP Server CA Certificate|/opt/cloudera/security/truststore/ca-truststore.pem
 
 3.5	Hive
-Because the production LDAP server’s TLS certificate is signed by a different root CA, We had to push out the updated truststore.jks and jssecacerts to all the hosts. 
+Because the production LDAP server’s TLS certificate is signed by a different root CA, We had to push out the updated truststore.jks and jssecacerts to all the hosts.
 
 Property	|Value
-| --- | --- | 
+| --- | --- |
 Enable LDAP Authentication|[x]
 LDAP URL|ldaps://KDC1.example.com
 Active Directory Domain|EXAMPLE.COM
@@ -376,26 +376,26 @@ LDAP Server CA Truststore|/opt/cloudera/security/truststore/ca-truststore.pem
 ## Cluster Service Over-the-Wire Encryption
 ### 1.	HBase
 Property	|Value
-| --- | --- | 
+| --- | --- |
 HBase Thrift Authentication|auth-conf
 HBase REST Authentication|Kerberos
 HBase Transport Security|Privacy
 Web UI TLS/SSL Encryption Enabled|[x]
-HBase TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
+HBase TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/pki/keystore.jks
 HBase TLS/SSL Server JKS Keystore File Password|REDACTED
 HBase TLS/SSL Server JKS Keystore Key Password|REDACTED
 Enable TLS/SSL for HBase REST Server|[x]
-HBase REST Server TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
+HBase REST Server TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/pki/keystore.jks
 HBase REST Server TLS/SSL Server JKS Keystore File Password|REDACTED
 HBase REST Server TLS/SSL Server JKS Keystore Key Password|REDACTED
 Enable TLS/SSL for HBase Thrift Server over HTTP|[x]
-HBase Thrift Server over HTTP TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
+HBase Thrift Server over HTTP TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/pki/keystore.jks
 HBase Thrift Server over HTTP TLS/SSL Server JKS Keystore File Password|REDACTED
 HBase Thrift Server over HTTP TLS/SSL Server JKS Keystore Key Password|REDACTED
 
 ### 2.	HDFS
 Property	|Value
-| --- | --- | 
+| --- | --- |
 Enable Kerberos Authentication for HTTP Web-Consoles|[x]
 DataNode Data Transfer Protection|privacy
 DataNode Transceiver Port|50010
@@ -403,32 +403,32 @@ Enable Access Control Lists|[x]
 Hadoop RPC Protection|privacy
 Enable Data Transfer Encryption|[x]
 Hadoop TLS/SSL Enabled|[x]
-Hadoop TLS/SSL Server Keystore File Location|/opt/cloudera/security/jks/keystore.jks
+Hadoop TLS/SSL Server Keystore File Location|/opt/cloudera/security/pki/keystore.jks
 Hadoop TLS/SSL Server Keystore File Password|REDACTED
 Hadoop TLS/SSL Server Keystore Key Password|REDACTED
-Cluster-Wide Default TLS/SSL Client Truststore Location|/opt/cloudera/security/jks/truststore.jks
+Cluster-Wide Default TLS/SSL Client Truststore Location|/opt/cloudera/security/pki/truststore.jks
 Cluster-Wide Default TLS/SSL Client Truststore Password|changeit
 Enable TLS/SSL for HttpFS|[x]
-HttpFS TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
+HttpFS TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/pki/keystore.jks
 HttpFS TLS/SSL Server JKS Keystore File Password|REDACTED
-HttpFS TLS/SSL Certificate Trust Store File|/opt/cloudera/security/jks/truststore.jks
+HttpFS TLS/SSL Certificate Trust Store File|/opt/cloudera/security/pki/truststore.jks
 HttpFS TLS/SSL Certificate Trust Store Password|REDACTED
 
 ### 3.	Hive
 Property	|Value
-| --- | --- | 
+| --- | --- |
 Enable TLS/SSL for HiveServer2|[x]
-HiveServer2 TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
+HiveServer2 TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/pki/keystore.jks
 HiveServer2 TLS/SSL Server JKS Keystore File Password|REDACTED
-HiveServer2 TLS/SSL Certificate Trust Store File|/opt/cloudera/security/jks/truststore.jks
+HiveServer2 TLS/SSL Certificate Trust Store File|/opt/cloudera/security/pki/truststore.jks
 HiveServer2 TLS/SSL Certificate Trust Store Password|REDACTED
 Enable TLS/SSL for HiveServer2 WebUI|[x]
 HiveServer2 WebUI TLS/SSL Server JKS Keystore File Password|REDACTED
-HiveServer2 WebUI TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
+HiveServer2 WebUI TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/pki/keystore.jks
 
 ### 4.	Impala
 Property	|Value
-| --- | --- | 
+| --- | --- |
 Enable TLS/SSL for Impala|[x]
 Impala TLS/SSL Server Certificate File (PEM Format)|/opt/cloudera/security/x509/cert.pem
 Impala TLS/SSL Server Private Key File (PEM Format)|/opt/cloudera/security/x509/key.pem
@@ -446,64 +446,64 @@ StateStore Webserver TLS/SSL Server Private Key File (PEM Format)|/opt/cloudera/
 StateStore Webserver TLS/SSL Private Key Password|REDACTED
 
 ### 5.	Kafka
-Property		|Value	
-| --- | --- | 
+Property		|Value
+| --- | --- |
 Enable TLS/SSL for Kafka Broker|[x]
-Kafka Broker TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
+Kafka Broker TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/pki/keystore.jks
 Kafka Broker TLS/SSL Server JKS Keystore File Password|REDACTED
 Kafka Broker TLS/SSL Server JKS Keystore Key Password|REDACTED
-Kafka Broker TLS/SSL Certificate Trust Store File|/opt/cloudera/security/jks/truststore.jks
+Kafka Broker TLS/SSL Certificate Trust Store File|/opt/cloudera/security/pki/truststore.jks
 Kafka Broker TLS/SSL Certificate Trust Store Password|REDACTED
 
 ### 6.	Key-Value Store
-Property	|Value	
-| --- | --- | 
-HBase Indexer TLS/SSL Certificate Trust Store File|/opt/cloudera/security/jks/truststore.jks
+Property	|Value
+| --- | --- |
+HBase Indexer TLS/SSL Certificate Trust Store File|/opt/cloudera/security/pki/truststore.jks
 HBase Indexer TLS/SSL Certificate Trust Store Password|REDACTED
 
 ### 7.	Oozie
-Property	|Value	
-| --- | --- | 
+Property	|Value
+| --- | --- |
 Enable TLS/SSL for Oozie |[x]
-Oozie TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
+Oozie TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/pki/keystore.jks
 Oozie TLS/SSL Server JKS Keystore File Password|REDACTED
-Oozie TLS/SSL Certificate Trust Store File|/opt/cloudera/security/jks/truststore.jks
+Oozie TLS/SSL Certificate Trust Store File|/opt/cloudera/security/pki/truststore.jks
 Oozie TLS/SSL Certificate Trust Store Password|REDACTED
 
 ### 8.	Solr
-Property	|Value	
-| --- | --- | 
+Property	|Value
+| --- | --- |
 Enable TLS/SSL for Solr|[x]
-Solr TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
+Solr TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/pki/keystore.jks
 Solr TLS/SSL Server JKS Keystore File Password|REDACTED
-Solr TLS/SSL Certificate Trust Store File|/opt/cloudera/security/jks/truststore.jks
+Solr TLS/SSL Certificate Trust Store File|/opt/cloudera/security/pki/truststore.jks
 Solr TLS/SSL Certificate Trust Store Password|REDACTED
 
 ### 9.	YARN
 Property	|Value
-| --- | --- | 
-Hadoop TLS/SSL Server Keystore File Location|/opt/cloudera/security/jks/keystore.jks
+| --- | --- |
+Hadoop TLS/SSL Server Keystore File Location|/opt/cloudera/security/pki/keystore.jks
 Hadoop TLS/SSL Server Keystore File Password|REDACTED
 Hadoop TLS/SSL Server Keystore Key Password|REDACTED
 Enable Kerberos Authentication for HTTP Web-Consoles|[x]
-TLS/SSL Client Truststore File Location|/opt/cloudera/security/jks/truststore.jks
+TLS/SSL Client Truststore File Location|/opt/cloudera/security/pki/truststore.jks
 TLS/SSL Client Truststore File Password|REDACTED
 
 ## Sentry
-Installed service on host master1.example-internal.net.  Make sure the database-connector-java.jar is  a supported version.  
+Installed service on host master1.example-internal.net.  Make sure the database-connector-java.jar is  a supported version.
 
 ### 1.	HDFS Sentry Configuration
 
-Property	|Value	
-| --- | --- | 
+Property	|Value
+| --- | --- |
 Enable Sentry Synchronization|[x]
 Sentry Synchronization Path Prefixes|/user/hive/warehouse
 |  |/otherdata
 Sentry Admin group|LDAP_admingroup
 
 ### 2.	Sentry Configuration
-Property	|Value	
-| --- | --- | 
+Property	|Value
+| --- | --- |
 Sentry Admin group +=|LDAP_admingroup
 
 
@@ -516,20 +516,20 @@ Add Sentry Service dependencies for:
   - [ ] Kafka
 
  -  [ ] On HiveServer2 make sure Impersonation is disabled.
- 
+
   - [ ] Log into beeline and set up the DBA role for the sentry admin group
- 
+
  - [ ] create role platform_admin;
 
 `grant all on server server1 to platform_admin; grant role platform_admin to group LDAP_admingroup;`
 
 
 ## HDFS Encryption at Rest
-HDFS transparent disk encryption should be configured using the Cloudera Manager wizard.  
+HDFS transparent disk encryption should be configured using the Cloudera Manager wizard.
 
 ### 1. Wizard
 
-Prior to running the wizard, 
+Prior to running the wizard,
  - [ ] Make sure the jssecacerts file from /user/java/latest/jre/lib/security/jssecacerts is copied to the same location on both KMS Proxy hosts.
 
  - [ ] Determine the name of the ORG  ___________ (typically part of the REALM)
@@ -542,13 +542,13 @@ Prior to running the wizard,
 
  - [ ] Identify the hosts that will perform the KMS roles
 ```
-    
-    
+
+
 ```
 
  - [ ] Make sure that the hosts that will run the key trustee role instances have the key trustee server parcel downloaded/distributed and activated.
 
-To do this, 
+To do this,
 ```copy KEYTRUSTEE_SERVER-5.10.0-1.keytrustee5.10.0.p0.26-el7.parcel and KEYTRUSTEE_SERVER-5.10.0-1.keytrustee5.10.0.p0.26-el7.parcel.sha to the CM host:/opt/cloudera/parcel-repo and then in CM parcels page click the “check for new parcels” button.
 ```
 
@@ -557,7 +557,7 @@ To do this,
  - [ ] Before the rsync step you may need to scp the CM host’s id_rsa* to root@keytrustee2:.ssh/
 
  - [ ] Identify the AD group that will have the privs to create keys. (referred to as LDAP_admingroup below)
- 
+
  - [ ] Check both hosts for entropy
 ```
 ssh root@kmshost 'cat /proc/sys/kernel/random/entropy_avail'
@@ -580,7 +580,7 @@ Initialized directory for 4096R/B9C9EDC386B9EC90007CDB115E25C433DF33E13C
 ```
 rsync -avP /var/lib/kms-keytrustee/keytrustee/.keytrustee/ root@<kmshost2>:/var/lib/kms-keytrustee/keytrustee/.keytrustee/
 ```
- 
+
  - [ ] Confirm the sigs are the same
 ```
 ssh kmshost1 'gpg --fingerprint --homedir /var/lib/kms-keytrustee/keytrustee/.keytrustee'
@@ -589,9 +589,9 @@ ssh kmshost2 'gpg --fingerprint --homedir /var/lib/kms-keytrustee/keytrustee/.ke
 
 ### 2	KeyTrustee Server Configuration Settings
 These settings were changed from the default during the wizard installation.
-Property	|Value	
-| --- | --- | 
-Active Key Trustee Server TLS/SSL Server Private Key File (PEM Format)|/opt/cloudera/security/x509/key.pem	
+Property	|Value
+| --- | --- |
+Active Key Trustee Server TLS/SSL Server Private Key File (PEM Format)|/opt/cloudera/security/x509/key.pem
 Active Key Trustee Server TLS/SSL Server Certificate File (PEM Format)|/opt/cloudera/security/x509/cert.pem
 Active Key Trustee Server TLS/SSL Server CA Certificate (PEM Format)|/opt/cloudera/security/truststore/truststore.pem
 Active Key Trustee Server TLS/SSL Private Key Password|REDACTED
@@ -602,7 +602,7 @@ Passive Key Trustee Server TLS/SSL Private Key Password|REDACTED
 
 6.2	KMS Proxy Configuration Settings
 
-Use the Key Trustee Servers that you just created 
+Use the Key Trustee Servers that you just created
 
 When the wizard asks for an ORG name: <ORGNAME>
 
@@ -626,15 +626,15 @@ Dropped privileges to keytrustee
         "state": 0,
         "uuid": "IPs2guXk0spuweeweboCpn9VA3zXFKhrbL1sPITpp"
     }
-} 
+}
 ```
 
-Property	|Value	
-| --- | --- | 
+Property	|Value
+| --- | --- |
 Enable TLS/SSL for Key Management Server Proxy|[x]
-Key Management Server Proxy TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/jks/keystore.jks
+Key Management Server Proxy TLS/SSL Server JKS Keystore File Location|/opt/cloudera/security/pki/keystore.jks
 Key Management Server Proxy TLS/SSL Server JKS Keystore File Password|REDACTED
-Key Management Server Proxy TLS/SSL Certificate Trust Store File|/opt/cloudera/security/jks/truststore.jks
+Key Management Server Proxy TLS/SSL Certificate Trust Store File|/opt/cloudera/security/pki/truststore.jks
 Key Management Server Proxy TLS/SSL Certificate Trust Store Password|REDACTED
 The following KMS ACLs were pasted into the configuration input text box in the wizard:
 ```
@@ -716,7 +716,7 @@ hadoop key create solr
 
  - [ ] Create the encryption zones for new data
 ```
-hdfs crypto -createZone -path /data -keyName datakey 
+hdfs crypto -createZone -path /data -keyName datakey
 hdfs crypto -createZone -path /keystore -keyName keystore_key
 ```
 
@@ -726,11 +726,11 @@ Because HBase and Solr were already initialized, those services will have to be 
 ```
 hdfs crypto -createZone -path /hbase -keyName hbase_key
 hdfs crypto -createZone -path /solr -keyName solr_key
-hdfs crypto -createZone -path /user/hive/warehouse -keyName datakey 
+hdfs crypto -createZone -path /user/hive/warehouse -keyName datakey
 ```
 
   ### 6.5	Missing encryption keys
-  
+
 During the installation process, it was discovered that some of the keys were no longer showing up with the Hadoop key –list command.
 Cloudera support ask PNC to turn off each KMS and retry the listing.  When lbdp34wbn.prod.pncint.net was the active KMS the keys appeared.  But it did not appear when lbdp34xbn.prod.pncint.net.
 The reason for this was because due to an installation error, the two KMSs had different identities from the perspective of the KTS.
@@ -753,7 +753,7 @@ pub   4096R/89A8D7C1 2016-03-15
 uid                  keytrustee (client) <kms@kms-1.lab.atx.cloudera.com>
 sub   4096R/CF52690D 2016-03-15
 ```
-The solution was to replicate the signature on one of the KMSs onto the other one so they would be perceived as the same identity by the KTS.  The first step was to first determine if any of the keys were critical and if there were critical keys on both KMSs. 
+The solution was to replicate the signature on one of the KMSs onto the other one so they would be perceived as the same identity by the KTS.  The first step was to first determine if any of the keys were critical and if there were critical keys on both KMSs.
 
 In this case there is only one critical key on one of the KMS instances.
 The process to correct this involved the following steps:
@@ -775,10 +775,10 @@ Message: [24/Apr/2017 07:05:31 -0700] WARNING  Caught LDAPError while authentica
 
  ###2. SSSD
  Look for the field guide to sssd config:
- 
+
  Pre-requisites:
 ●	Ensure FQDN (forward and reverse), DNS, NTP and network is solid
-●	OS packages: krb5-workstation, krb5-libs, krb5-auth-dialog, 
+●	OS packages: krb5-workstation, krb5-libs, krb5-auth-dialog,
 ○	sssd, sssd-ad, samba-client - (should work on EL6 and EL7)
 ○	sssd and realmd (on EL7)
 ●	Install SSSD on every host
@@ -788,6 +788,3 @@ Message: [24/Apr/2017 07:05:31 -0700] WARNING  Caught LDAPError while authentica
 ●	Disable NSCD from caching AD lookups
 ●	(Postrequisite) Disable CM from managing krb5.conf (this is always a good practice)
 ●	All groups that we are using should be created in the new OU
-
-
- 
