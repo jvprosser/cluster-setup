@@ -591,14 +591,14 @@ ssh kmshost2 'gpg --fingerprint --homedir /var/lib/kms-keytrustee/keytrustee/.ke
 These settings were changed from the default during the wizard installation.
 Property	|Value
 | --- | --- |
-Active Key Trustee Server TLS/SSL Server Private Key File (PEM Format)|/opt/cloudera/security/x509/key.pem
-Active Key Trustee Server TLS/SSL Server Certificate File (PEM Format)|/opt/cloudera/security/x509/cert.pem
-Active Key Trustee Server TLS/SSL Server CA Certificate (PEM Format)|/opt/cloudera/security/truststore/truststore.pem
-Active Key Trustee Server TLS/SSL Private Key Password|REDACTED
-Passive Key Trustee Server TLS/SSL Server Private Key File (PEM Format)|/opt/cloudera/security/x509/key.pem
-Passive Key Trustee Server TLS/SSL Server Certificate File (PEM Format)|/opt/cloudera/security/x509/cert.pem
-Passive Key Trustee Server TLS/SSL Server CA Certificate (PEM Format)|/opt/cloudera/security/truststore/truststore.pem
-Passive Key Trustee Server TLS/SSL Private Key Password|REDACTED
+|Active Key Trustee Server TLS/SSL Server Private Key File (PEM Format)|/opt/cloudera/security/x509/key.pem
+|Active Key Trustee Server TLS/SSL Server Certificate File (PEM Format)|/opt/cloudera/security/x509/cert.pem
+|Active Key Trustee Server TLS/SSL Server CA Certificate (PEM Format)|/opt/cloudera/security/truststore/truststore.pem
+|Active Key Trustee Server TLS/SSL Private Key Password|REDACTED
+|Passive Key Trustee Server TLS/SSL Server Private Key File (PEM Format)|/opt/cloudera/security/x509/key.pem
+|Passive Key Trustee Server TLS/SSL Server Certificate File (PEM Format)|/opt/cloudera/security/x509/cert.pem
+|Passive Key Trustee Server TLS/SSL Server CA Certificate (PEM Format)|/opt/cloudera/security/truststore/truststore.pem
+|Passive Key Trustee Server TLS/SSL Private Key Password|REDACTED
 
 6.2	KMS Proxy Configuration Settings
 
