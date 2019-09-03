@@ -1,6 +1,7 @@
 # cluster-setup
-`alias jpssh="~/pssh-2.3.1/bin/pssh --timeout=0 --inline-stdout  -h  ~/hostlist.txt -x '-tt' -X '-oStrictHostKeyChecking=no'"`
-`alias jpscp="~/pssh-2.3.1/bin/pscp  -h  ~/hostlist.txt -X '-oStrictHostKeyChecking=no'"`
+`alias jpssh="pssh --timeout=0 --inline-stdout  -h  ~/hostlist.txt -x '-tt' -X '-oStrictHostKeyChecking=no'"`
+
+`alias jpscp="pscp.pssh  -h  ~/hostlist.txt -X '-oStrictHostKeyChecking=no'"`
 
 `export HADOOP_CLASSPATH=/etc/hbase/conf:/opt/cloudera/parcels/CDH/lib/hbase/hbase-common-1.0.0-cdh5.5.0.jar:/opt/cloudera/parcels/CDH/lib/hbase/hbase-server.jar:/opt/cloudera/parcels/CDH/lib/hbase/*:/opt/cloudera/parcels/CDH/lib/hbase/lib/*:/opt/cloudera/parcels/CDH/lib/hbase/cloudera/*:$HADOOP_CLASSPATH`
 
